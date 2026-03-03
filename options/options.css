@@ -108,9 +108,9 @@ body.options-body {
 }
 
 .goal-card.selected {
-    border-color: #17CE3A;
-    background-color: #f0fff4;
-    box-shadow: 0 0 0 3px rgba(23, 206, 58, 0.1);
+    border-color: var(--primary-color);
+    background-color: var(--primary-light);
+    box-shadow: 0 0 0 3px var(--primary-shadow);
 }
 
 .goal-card .icon { 
@@ -136,14 +136,14 @@ body.options-body {
     margin-top: 15px;
     height: 20px;
     font-size: 16px;
-    color: #17CE3A;
+    color: var(--primary-color);
     font-weight: bold;
     text-align: center;
 }
 
 .range-preview-box {
-    background-color: #e8f5e9;
-    color: #2e7d32;
+    background-color: var(--primary-light);
+    color: var(--primary-color);
     padding: 14px;
     border-radius: 8px;
     display: block;
@@ -172,9 +172,9 @@ body.options-body {
 }
 
 .diff-card.selected {
-    background-color: #f0fff4;
-    border-color: #17CE3A;
-    box-shadow: 0 0 0 3px rgba(23, 206, 58, 0.1);
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-shadow);
     color: #333;
     font-weight: bold;
 }
@@ -216,7 +216,7 @@ body.options-body {
     margin: 0 auto 10px;
     width: 30px; height: 30px;
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #17CE3A;
+    border-top: 3px solid var(--primary-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -265,7 +265,7 @@ body.options-body {
     margin-bottom: 10px;
     font-size: 13px;
     color: #333;
-    border-left: 4px solid #17CE3A;
+    border-left: 4px solid var(--primary-color);
     line-height: 1.5;
     text-align: center; 
     word-break: keep-all;

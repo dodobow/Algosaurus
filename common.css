@@ -1,3 +1,11 @@
+:root {
+    --primary-color: #117857;
+    --primary-hover: #0c3a2b;
+    --primary-light: #e3f5ef;
+    --primary-shadow: rgba(17, 184, 142, 0.1);
+    --highlight-color: #6cebc3;
+}
+
 /* --- 기본 설정 (Reset & Font) --- */
 body {
     font-family: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
@@ -30,13 +38,13 @@ input {
 }
 
 input:focus {
-    border-color: #17CE3A;
+    border-color: var(--primary-color);
 }
 
 /* --- 공통 버튼 (Button) --- */
 button {
     padding: 10px 16px;
-    background-color: #17CE3A;
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 8px;
@@ -46,7 +54,7 @@ button {
 }
 
 button:hover {
-    background-color: #197e2b;
+    background-color: var(--primary-hover);
 }
 
 /* --- 구분선 (Divider) --- */
