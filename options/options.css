@@ -275,3 +275,33 @@ body.options-body {
 @media (max-width: 900px) {
     .dashboard-grid { grid-template-columns: 1fr; }
 }
+
+.tag-groups-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.tag-group-section {
+    padding: 10px;
+    border-radius: 12px;
+    background: #fdfdfd;
+}
+
+.group-title {
+    font-size: 15px;
+    font-weight: 800;
+    margin: 0 0 10px 5px;
+    color: #444;
+}
+
+.group-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.tag-group-section:empty {
+    display: none;
+}

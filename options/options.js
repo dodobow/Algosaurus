@@ -122,7 +122,9 @@ const TARGET_TAGS = [
 async function loadAnalysis() {
     const spinner = document.getElementById('loading-spinner');
     const resultBox = document.getElementById('analysis-result');
-    const tagGrid = document.getElementById('tag-grid');
+    const gridStrong = document.getElementById('grid-strong');
+    const gridNormal = document.getElementById('grid-normal');
+    const gridWeak = document.getElementById('grid-weak');
     const commentBox = document.getElementById('analysis-comment');
     
     spinner.style.display = 'block';
@@ -155,24 +157,32 @@ async function loadAnalysis() {
             const totalRating = results.reduce((sum, data) => sum + data.rating, 0);
             const avgRating = totalRating / TARGET_TAGS.length;
             let strongTags = [], weakTags = [];
-            tagGrid.innerHTML = '';
             
+            gridStrong.innerHTML = '';
+            gridNormal.innerHTML = '';
+            gridWeak.innerHTML = '';
+
             results.forEach(data => {
                 const tagCard = document.createElement('div');
                 const relativeTagRating = avgRating === 0 ? 0 : (data.rating - avgRating) / avgRating * 100;
                 
                 tagCard.className = 'tag-card';
+                
                 if (relativeTagRating < -10) {
                     tagCard.classList.add('weak');
                     weakTags.push(data.name);
+                    gridWeak.appendChild(tagCard);
                 }
                 else if (relativeTagRating > 10) {
                     tagCard.classList.add('strong');
                     strongTags.push(data.name);
+                    gridStrong.appendChild(tagCard);
                 }
                 else {
                     tagCard.classList.add('normal');
+                    gridNormal.appendChild(tagCard);
                 }
+                
                 tagCard.innerHTML = `
                 <span class="tag-name">${data.name}</span>
                 <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 5px;">
@@ -181,8 +191,7 @@ async function loadAnalysis() {
                         ${data.rating}
                     </span>
                 </div>`;
-                tagGrid.appendChild(tagCard);
-            })
+            });
             let summaryText = '';
             if (weakTags.length > 0 && strongTags.length > 0) {
                 summaryText = `🔥 <b>${weakTags.join(', ')}</b> 보완이 필요하지만,<br>💪 <b>${strongTags.join(', ')}</b> 분야는 훌륭해요!`;
