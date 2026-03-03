@@ -60,14 +60,32 @@
                     </div>
                 </section>
 
-                <section class="card extra-panel" style="flex: 1; min-height: 120px; display: flex; align-items: center; justify-content: center; border: 2px dashed #ccc; background: #fdfdfd; box-shadow: none;">
-                    <div style="text-align: center; color: #888;">
-                        <span style="font-size: 32px; display: block; margin-bottom: 10px;">🛠️</span>
-                        <h3 style="margin: 0; font-size: 16px;">새로운 기능 준비 중</h3>
-                        <p style="font-size: 13px; margin-top: 5px;">어떤 기능이 추가될까요?</p>
+                <section class="card inner-panel">
+                    <div class="card-header">
+                        <h2>📚 내실 검사</h2>
+                        <button id="refresh-inner-btn" class="refresh-btn" title="새로고침" style="display: none;">🔄</button>
+                    </div>
+
+                    <div class="card-body">
+                        <p class="subtitle-small">상위 200문제의 난이도를 분석하여 내실을 분석합니다.</p>
+                        
+                        <div id="inner-start-box" style="text-align: center; padding: 10px 0;">
+                        </div>
+
+                        <div id="inner-loading" class="spinner-container" style="display: none;">
+                            <div class="spinner"></div>
+                            <p>내 진짜 실력을 파헤치는 중...</p>
+                        </div>
+
+                        <div id="inner-result" style="display: none; text-align: center;">
+                            <div class="summary-box" id="inner-comment"></div>
+                            
+                            <div style="margin-top: 10px; font-size: 15px; color: #666;">
+                                내실 레이팅: <span id="inner-rating-text" style="font-weight: bold; color: var(--primary-color);"></span>
+                            </div>
+                        </div>
                     </div>
                 </section>
-
             </div>
 
             <div class="right-column">
@@ -109,34 +127,14 @@
                         </div>
                     </div>
                 </section>
-
-                <section class="card inner-panel">
-                        <div class="card-header">
-                            <h2>📚 내실 검사</h2>
-                            <button id="refresh-inner-btn" class="refresh-btn" title="새로고침" style="display: none;">🔄</button>
-                        </div>
-
-                        <div class="card-body">
-                            <p class="subtitle-small">상위 200문제의 난이도를 분석하여 내실을 분석합니다.</p>
-                            
-                            <div id="inner-start-box" style="text-align: center; padding: 10px 0;">
-                            </div>
-
-                            <div id="inner-loading" class="spinner-container" style="display: none;">
-                                <div class="spinner"></div>
-                                <p>내 진짜 실력을 파헤치는 중...</p>
-                            </div>
-
-                            <div id="inner-result" style="display: none; text-align: center;">
-                                <div class="summary-box" id="inner-comment"></div>
-                                
-                                <div style="margin-top: 10px; font-size: 15px; color: #666;">
-                                    내실 레이팅: <span id="inner-rating-text" style="font-weight: bold; color: var(--primary-color);"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
+                <section class="card extra-panel" style="min-height: 120px; display: flex; align-items: center; justify-content: center; border: 2px dashed #ccc; background: #fdfdfd; box-shadow: none;">
+                    <div style="text-align: center; color: #888;">
+                        <span style="font-size: 32px; display: block; margin-bottom: 10px;">🛠️</span>
+                        <h3 style="margin: 0; font-size: 16px;">새로운 기능 준비 중</h3>
+                        <p style="font-size: 13px; margin-top: 5px;">어떤 기능이 추가될까요?</p>
+                    </div>
+                </section>
+            </div>
         </main>
     </div>
 
