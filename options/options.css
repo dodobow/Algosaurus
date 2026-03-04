@@ -295,12 +295,6 @@ body.options-body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
-.group-title {
-    font-size: 14px;
-    padding: 5px 10px;
-    margin-bottom: 8px;
-}
-
 .inner-panel {
     flex: 1;
     display: flex;
@@ -312,4 +306,14 @@ body.options-body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.extra-panel {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #ccc;
+    background: #fdfdfd;
+    box-shadow: none;
 }

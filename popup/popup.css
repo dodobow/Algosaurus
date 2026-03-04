@@ -1,10 +1,8 @@
-/* --- 팝업 레이아웃 --- */
 .popup-body {
     width: 380px;
     padding: 25px 20px;
 }
 
-/* --- 팝업 전용 버튼 --- */
 #recommendBtn {
     width: 100%;
     background-color: var(--primary-color);
@@ -15,7 +13,6 @@
     background-color: var(--primary-hover);
 }
 
-/* --- 결과 박스 (Result Box) --- */
 #result {
     background: white;
     padding: 15px;
@@ -46,7 +43,6 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* --- 대시보드 이동 뱃지 버튼 --- */
 .dashboard-badge {
     position: absolute;
     right: 0;
@@ -72,4 +68,27 @@
     border-color: var(--primary-color);
     color: var(--primary-hover);
     transform: translateY(-50%) scale(1.05);
+}
+
+.popup-header {
+    position: relative; 
+    text-align: center; 
+    margin-bottom: 20px;
+}
+
+.popup-header h1 {
+    margin: 0; 
+    display: inline-block;
+}
+
+.recommend-box {
+    margin-top: 15px; 
+    border-top: 1px solid #eee; 
+    padding-top: 15px;
+}
+
+.problem-view-box {
+    margin-top: 15px; 
+    font-size: 14px; 
+    color: #333;
 }

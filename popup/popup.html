@@ -6,8 +6,8 @@
         <link rel="stylesheet" href="popup.css">
     </head>
     <body class="popup-body">
-        <div style="position: relative; text-align: center; margin-bottom: 20px;">
-            <h1 style="margin: 0; display: inline-block;">🦖 PS 길라잡이 🦕</h1>
+        <div class="popup-header">
+            <h1>🦖 PS 길라잡이 🦕</h1>
             <button id="settingBtn" class="dashboard-badge">🎯 My Page</button>
         </div>
         
@@ -20,12 +20,11 @@
             아이디를 입력하고<br>티어를 확인해보세요!
         </div>
         
-        <div id="recommend-section" style="display: none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
-            <button id="recommendBtn">
-                오늘의 문제 뽑기 🎲
-            </button>
-            <div id="problem-view" style="margin-top: 15px; font-size: 14px; color: #333;"></div>
+        <div id="recommend-section" class="recommend-box" style="display: none;">
+            <button id="recommendBtn">오늘의 문제 뽑기 🎲</button>
+            <div id="problem-view" class="problem-view-box"></div>
         </div>
+        
         <script src="../utils.js"></script>
         <script src="popup.js"></script>
     </body>
