@@ -317,3 +317,43 @@ body.options-body {
     background: #fdfdfd;
     box-shadow: none;
 }
+
+.toggle-container {
+    position: relative;
+    display: flex;
+    background-color: #333;
+    border-radius: 30px;
+    padding: 4px;
+    cursor: pointer;
+    width: 160px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toggle-option {
+    flex: 1;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: #999;
+    z-index: 1;
+    padding: 6px 0;
+    transition: color 0.3s ease;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    height: calc(100% - 8px);
+    background-color: white;
+    border-radius: 20px;
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.toggle-container:not(.custom-mode) .toggle-option[data-type="default"] { color: #333; }
+.toggle-container.custom-mode .toggle-option[data-type="custom"] { color: #333; }
+
+.toggle-container.custom-mode .toggle-slider {
+    transform: translateX(100%);
+}
