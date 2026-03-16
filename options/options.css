@@ -278,12 +278,65 @@ body.options-body {
 #section-weak   { background-color: #ffeeee; border: 1px solid #ffc9c9; }
 
 .tag-card {
+    position: relative;
     background: white;
     border: 1px solid rgba(0,0,0,0.05);
     border-radius: 10px;
     padding: 10px;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    cursor: help;
+}
+
+.tag-tooltip {
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    width: 220px;
+    padding: 12px;
+    border-radius: 12px;
+    
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.tag-card:hover .tag-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.tooltip-comment {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    line-height: 1.4;
+    word-break: keep-all;
+}
+
+.tooltip-divider {
+    height: 1px;
+    background: rgba(0,0,0,0.05);
+    margin: 8px 0;
+}
+
+.tooltip-tags {
+    display: block;
+    font-size: 13px;
+    color: #333;
+    font-weight: 600;
+    line-height: 1.5;
 }
 
 .inner-panel {

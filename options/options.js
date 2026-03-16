@@ -216,7 +216,12 @@ async function loadAnalysis(userId) {
                 let rating = 0;
                 data.items.forEach(problem => {rating += problem.level;})
                 rating = rating * 2 + Math.round(200 * (1 - Math.pow(0.99, data.count)));
-                return {'name' : tag.name, 'rating' : rating, 'tierInfo' : calculateTierInfo(calculateRatingToTier(rating))};
+                return {
+                    'name' : tag.name,
+                    'rating' : rating,
+                    'tierInfo' : calculateTierInfo(calculateRatingToTier(rating)),
+                    'keys': tag.key // ✨ 추가: 해시태그 출력을 위해 key 배열을 넘겨줌!
+                };
             }));
             results.sort((a, b) => b.rating - a.rating);
 
@@ -249,6 +254,11 @@ async function loadAnalysis(userId) {
                     gridNormal.appendChild(tagCard);
                 }
                 
+                // ✨ 화면에 보여줄 해시태그 문자열 만들기 (예: "#dp #knapsack")
+                const hashTags = data.keys.join(' '); 
+                // ✨ 일단 디자인을 보기 위한 임시 한줄평
+                const comment = "이 태그의 정점을 찍어봅시다! 🔥";
+                
                 tagCard.innerHTML = `
                 <span class="tag-name">${data.name}</span>
                 <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 5px;">
@@ -256,7 +266,14 @@ async function loadAnalysis(userId) {
                     <span class="tag-tier" style="color: ${data.tierInfo.color}; display: inline-block; line-height: 1;">
                         ${data.rating}
                     </span>
-                </div>`;
+                </div>
+
+                <div class="tag-tooltip">
+                    <span class="tooltip-comment">${comment}</span>
+                    <div class="tooltip-divider"></div>
+                    <span class="tooltip-tags">${hashTags}</span>
+                </div>
+                `;
             });
             let summaryText = '';
             if (weakTags.length > 0 && strongTags.length > 0) {
