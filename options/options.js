@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.close();
             return;
         }
-
         
         titleMsg.innerHTML = `✈️
         <span style="color: ${userTierInfo.color}; font-weight: bold;">${userId}</span>
@@ -161,11 +160,86 @@ const GOAL_TAGS = {
         {key : ['#ad_hoc'], name : '애드 혹'},
         {key : ['#greedy'], name : '그리디 알고리즘'},
         {key : ['#dp', '#dp_tree', '#dp_digit', '#dp_bitfield', '#tsp', '#cht'], name : '다이나믹 프로그래밍'},
-        {key : ['#graphs', '#trees', '#flow', '#mcmf', '#mfmc', '#scc', '2_sat', '#bipartite_matching', '#lca'], name : '그래프와 트리'},
-        {key : ['#geometry', '#convex_hull', '#line_intersection', '#rotating_calipers'], name : '기하학'},
+        {key : ['#graphs', '#trees', '#flow', '#mcmf', '#mfmc', '#scc', '#2_sat', '#bipartite_matching', '#lca', '#centroid'], name : '그래프와 트리'},
+        {key : ['#geometry', '#convex_hull', '#line_intersection', '#rotating_calipers', '#polygon_area'], name : '기하학'},
         {key : ['#mo', '#offline_queries', '#sqrt_decomposition', '#smaller_to_larger', '#coordinate_compression'], name : '쿼리와 최적화'},
         {key : ['#bitmask', '#mitm', '#sweeping', '#permutation_cycle_decomposition', '#game_theory', '#sprague_grundy', '#euler_tour_technique'], name : '다양한 테크닉'}
     ]
+}
+
+const TAG_TRANSLATE = {
+    'dp' : '다이나믹 프로그래밍',
+    'implementation' : '구현',
+    'greedy' : '그리디 알고리즘',
+    'data_structures' : '자료 구조',
+    'string' : '문자열',
+    'math' : '수학',
+    'geometry' : '기하학',
+    'simulation' : '시뮬레이션',
+    'bruteforcing' : '브루트포스 알고리즘',
+    'binary_search' : '이분 탐색',
+    'arithmetic' : '사칙연산',
+    'stack' : '스택',
+    'queue' : '큐',
+    'deque' : '덱',
+    'sorting' : '정렬',
+    'recursion' : '재귀',
+    'set' : '집합과 맵',
+    'knapsack' : '배낭 문제',
+    'shortest_path' : '최단 경로',
+    'bfs' : '너비 우선 탐색',
+    'dfs' : '깊이 우선 탐색',
+    'priority_queue' : '우선순위 큐',
+    'disjoint_set' : '분리 집합',
+    'parametric_search' : '매개 변수 탐색',
+    'backtracking' : '백트래킹',
+    'case_work' : '많은 조건 분기',
+    'prefix_sum' : '누적 합',
+    'sliding_window' : '슬라이딩 윈도우',
+    'sweeping' : '스위핑',
+    'segtree' : '세그먼트 트리',
+    'lazyprop' : '느리게 갱신되는 세그먼트 트리',
+    'pst' : '퍼시스턴트 세그먼트 트리',
+    'merge_sort_tree' : '머지 소트 트리',
+    'kmp' : 'KMP',
+    'trie' : '트라이',
+    'number_theory' : '정수론',
+    'probability' : '확률론',
+    'combinatorics' : '조합론',
+    'tsp' : '외판원 순회 문제',
+    'cht' : '볼록 껍질을 이용한 최적화',
+    'flow' : '최대 유량',
+    'mcmf' : '최소 비용 최대 유량',
+    'mfmc' : '최대 유량 최소 컷 정리',
+    'scc' : '강한 연결 요소',
+    'bipartite_matching' : '이분 매칭',
+    'lca' : '최소 공통 조상',
+    'convex_hull' : '볼록 껍질',
+    'rotating_calipers' : '회전하는 캘리퍼스',
+    'offline_queries' : '오프라인 쿼리',
+    'sqrt_decomposition' : '제곱근 분할법',
+    'smaller_to_larger' : '작은 집합에서 큰 집합으로 합치는 테크닉',
+    'bitmask' : '비트마스킹',
+    'permutation_cycle_decomposition' : '순열 사이클 분할',
+    'game_theory' : '게임 이론',
+    'euler_tour_technique' : '오일러 경로 테크닉',
+
+    'dp_tree' : '트리에서의 DP',
+    'two_pointer' : '투 포인터',
+    'coordinate_compression' : '값 / 좌표 압축',
+    'dp_digit' : '자릿수를 이용한 DP',
+    'line_intersection' : '선분 교차 판정',
+    'mo' : 'mo\'s',
+    'graphs' : '그래프 이론',
+    'mitm' : '중간에서 만나기',
+    '2_sat' : '2-sat',
+    'trees' : '트리',
+    'ad_hoc' : '애드 혹',
+    'sprague_grundy' : '스프라그 그런디 정리',
+    'suffix_array' : '접미사 배열과 LCP 배열',
+    'dp_bitfield' : '비트필드를 이용한 DP',
+    'polygon_area' : '다각형의 넓이',
+    'centroid' : '센트로이드'
 }
 
 let isCustomMode = false;
@@ -220,7 +294,7 @@ async function loadAnalysis(userId) {
                     'name' : tag.name,
                     'rating' : rating,
                     'tierInfo' : calculateTierInfo(calculateRatingToTier(rating)),
-                    'keys': tag.key // ✨ 추가: 해시태그 출력을 위해 key 배열을 넘겨줌!
+                    'keys': tag.key
                 };
             }));
             results.sort((a, b) => b.rating - a.rating);
@@ -254,10 +328,12 @@ async function loadAnalysis(userId) {
                     gridNormal.appendChild(tagCard);
                 }
                 
-                // ✨ 화면에 보여줄 해시태그 문자열 만들기 (예: "#dp #knapsack")
-                const hashTags = data.keys.join(' '); 
-                // ✨ 일단 디자인을 보기 위한 임시 한줄평
-                const comment = "이 태그의 정점을 찍어봅시다! 🔥";
+                let korTags = [];
+                data.keys.forEach((engTag) => {
+                    korTags.push(`<span class="tag-badge">#${TAG_TRANSLATE[engTag.slice(1)]}</span>`);
+                })
+                console.log(korTags);
+                const hashTags = korTags.join('<br>');
                 
                 tagCard.innerHTML = `
                 <span class="tag-name">${data.name}</span>
@@ -269,8 +345,6 @@ async function loadAnalysis(userId) {
                 </div>
 
                 <div class="tag-tooltip">
-                    <span class="tooltip-comment">${comment}</span>
-                    <div class="tooltip-divider"></div>
                     <span class="tooltip-tags">${hashTags}</span>
                 </div>
                 `;

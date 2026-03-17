@@ -237,6 +237,8 @@ body.options-body {
     line-height: 1.5;
     text-align: center; 
     word-break: keep-all;
+    text-wrap: balance;
+    text-wrap: pretty;
 }
 
 @media (max-width: 900px) {
@@ -315,28 +317,24 @@ body.options-body {
     transform: translateX(-50%) translateY(0);
 }
 
-.tooltip-comment {
-    display: block;
-    font-size: 15px;
-    font-weight: 800;
-    color: var(--primary-color);
-    margin-bottom: 8px;
-    line-height: 1.4;
-    word-break: keep-all;
-}
-
-.tooltip-divider {
-    height: 1px;
-    background: rgba(0,0,0,0.05);
-    margin: 8px 0;
-}
-
 .tooltip-tags {
-    display: block;
-    font-size: 13px;
-    color: #333;
-    font-weight: 600;
-    line-height: 1.5;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 5px;
+}
+
+.tag-badge {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    border: 1px solid var(--highlight-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
 }
 
 .inner-panel {
