@@ -331,8 +331,8 @@ async function loadAnalysis(userId) {
                 let korTags = [];
                 data.keys.forEach((engTag) => {
                     korTags.push(`<span class="tag-badge">#${TAG_TRANSLATE[engTag.slice(1)]}</span>`);
-                })
-                console.log(korTags);
+                });
+                
                 const hashTags = korTags.join('<br>');
                 
                 tagCard.innerHTML = `
