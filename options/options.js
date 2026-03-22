@@ -167,7 +167,7 @@ const GOAL_TAGS = {
     ]
 }
 
-const TAG_TRANSLATE = {
+const TAG_ENG_TO_KOR = {
     'dp' : '다이나믹 프로그래밍',
     'implementation' : '구현',
     'greedy' : '그리디 알고리즘',
@@ -301,7 +301,7 @@ async function loadAnalysis(userId) {
 
             const totalRating = results.reduce((sum, data) => sum + data.rating, 0);
             const avgRating = totalRating / TARGET_TAGS.length;
-            let strongTags = [], weakTags = [];
+            let strongTags = [], weakTags = [], weakTagsForRecommned = [];
             
             gridStrong.innerHTML = '';
             gridNormal.innerHTML = '';
@@ -316,6 +316,7 @@ async function loadAnalysis(userId) {
                 if (relativeTagRating < -10) {
                     tagCard.classList.add('weak');
                     weakTags.push(data.name);
+                    data.keys.forEach((tag) => {weakTagsForRecommned.push(tag)});
                     gridWeak.appendChild(tagCard);
                 }
                 else if (relativeTagRating > 10) {
@@ -327,10 +328,12 @@ async function loadAnalysis(userId) {
                     tagCard.classList.add('normal');
                     gridNormal.appendChild(tagCard);
                 }
+
+                chrome.storage.local.set({[`weakTags_${userId}`] : weakTagsForRecommned});
                 
                 let korTags = [];
                 data.keys.forEach((engTag) => {
-                    korTags.push(`<span class="tag-badge">#${TAG_TRANSLATE[engTag.slice(1)]}</span>`);
+                    korTags.push(`<span class="tag-badge">#${TAG_ENG_TO_KOR[engTag.slice(1)]}</span>`);
                 });
                 
                 const hashTags = korTags.join('<br>');

@@ -92,3 +92,13 @@
     font-size: 14px; 
     color: #333;
 }
+
+.weak-btn {
+    width: 100%;
+    background-color: #ff8787 !important;
+    margin-top: 8px;
+}
+
+.weak-btn:hover {
+    background-color: #fa5252 !important;
+}

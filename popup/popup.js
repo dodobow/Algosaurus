@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputField = document.getElementById('solvedId');
     const resultDiv = document.getElementById('result');
     const recommendButton = document.getElementById('recommendBtn');
+    const recommendByWeakTagsButton = document.getElementById('weakRecommendBtn');
     const settingButton = document.getElementById('settingBtn');
 
     loginButton.addEventListener('click', () => handleSearch(inputField, resultDiv));
@@ -14,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     recommendButton.addEventListener('click', () => recommendProblem(cachedUserData.tier));
+
+    recommendByWeakTagsButton.addEventListener('click', () => recommendedProblemByWeakTags(cachedUserData.tier));
 
     inputField.focus();
 
@@ -135,4 +138,56 @@ function getStorageData(keys) {
             resolve(result);
         });
     });
+}
+
+async function recommendedProblemByWeakTags(userTier) {
+    const problemDiv = document.getElementById('problem-view');
+    problemDiv.innerHTML = '문제 찾는 중...';
+    
+    try {
+        const userId = cachedUserData.handle;
+        const goalKey = `goal_${userId}`;
+        const diffKey = `diff_${userId}`;
+        const weakTagsKey = `weakTags_${userId}`;
+
+        const storedData = await getStorageData([goalKey, diffKey, weakTagsKey]);
+        const userGoal = storedData[goalKey];
+        const userDiff = storedData[diffKey] ? storedData[diffKey] : 0;
+        
+        let userWeakTags = storedData[weakTagsKey];
+        if (userWeakTags.length === 0) {
+            problemDiv.innerHTML = '약점이 없거나 아직 대시보드에서 태그 분석이 이루어지지 않았어요!';
+            return;
+        }
+        userWeakTags.sort(() => Math.random() - 0.5);
+
+        const recommendTag = userWeakTags[0];
+        const recommendRange = calculateRecommendTier(userTier, userGoal, parseInt(userDiff));
+        
+        for (const tagQuery of [recommendTag, `(${userWeakTags.join(' | ')})`]) {
+            const queryString = `*${recommendRange.lo}..${recommendRange.hi} ${tagQuery} !@$me %ko s#100..`;
+            console.log(queryString);
+            const url = `https://solved.ac/api/v3/search/problem?query=${encodeURIComponent(queryString)}&sort=random`;
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('문제 정보를 가져올 수 없습니다.');
+            }
+            const data = await response.json();
+            if (data.items.length != 0) {
+                const recommendedProblem = data.items[0];
+                problemDiv.innerHTML = `
+                    <a href="https://www.acmicpc.net/problem/${recommendedProblem.problemId}" target="_blank" class="problem-link">
+                        <span style="font-weight:bold; color:#0078FF;">${recommendedProblem.problemId}번</span>
+                        <span>${recommendedProblem.titleKo}</span>
+                    </a>
+                `;
+                console.log(queryString);
+                console.log(url);
+                break;
+            }
+        }
+    } catch (error) {
+        problemDiv.innerHTML = `<span style="color: red;">${error.message}</span>`;
+    }
 }
