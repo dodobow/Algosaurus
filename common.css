@@ -1,9 +1,16 @@
 :root {
-    --primary-color: #117857;
+    --primary-color: #0b6347;
     --primary-hover: #0c3a2b;
     --primary-light: #e3f5ef;
+    --primary-light-hover: #cbf3e4;
     --primary-shadow: rgba(17, 184, 142, 0.1);
     --highlight-color: #6cebc3;
+
+    --weak-color: #e03131;
+    --weak-hover: #ffe3e3;
+    --weak-light: #fff0f0;
+    --weak-border: #ffc9c9;
+    --weak-shadow: rgba(224, 49, 49, 0.1);
 }
 
 body {
@@ -40,9 +47,9 @@ input:focus {
 
 button {
     padding: 10px 16px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    border: 1px solid var(--highlight-color); 
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
@@ -50,7 +57,8 @@ button {
 }
 
 button:hover {
-    background-color: var(--primary-hover);
+    background-color: var(--primary-light-hover);
+    box-shadow: 0 4px 10px var(--primary-shadow);
 }
 
 .divider {

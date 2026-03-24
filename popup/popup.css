@@ -4,13 +4,15 @@
 }
 
 #recommendBtn {
-    width: 100%;
-    background-color: var(--primary-color);
-    margin-top: 5px;
+    background-color: var(--primary-light) !important; /* 연한 민트 배경 */
+    color: var(--primary-color) !important;           /* 진한 초록 글씨 */
+    border: 1px solid var(--highlight-color) !important; 
 }
 
 #recommendBtn:hover {
-    background-color: var(--primary-hover);
+    background-color: #cbf3e4 !important; /* hover 시 살짝만 더 진하게 */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px var(--primary-shadow);
 }
 
 #result {
@@ -93,12 +95,44 @@
     color: #333;
 }
 
-.weak-btn {
-    width: 100%;
-    background-color: #ff8787 !important;
-    margin-top: 8px;
+.btn-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 5px;
 }
 
-.weak-btn:hover {
-    background-color: #fa5252 !important;
+.btn-group button {
+    flex: 1;
+    width: auto;
+    margin-top: 0;
+    font-size: 13px;
+    padding: 10px 5px;
+    white-space: nowrap;
+    background-color: transparent; 
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-group #recommendBtn {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    border: 1px solid var(--highlight-color); 
+}
+
+.btn-group #recommendBtn:hover {
+    background-color: var(--primary-light-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px var(--primary-shadow);
+}
+
+.btn-group .weak-btn {
+    background-color: var(--weak-light);
+    color: var(--weak-color);
+    border: 1px solid var(--weak-border);
+}
+
+.btn-group .weak-btn:hover {
+    background-color: var(--weak-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px var(--weak-shadow);
 }
