@@ -306,7 +306,7 @@ async function loadAnalysis(userId) {
             gridStrong.innerHTML = '';
             gridNormal.innerHTML = '';
             gridWeak.innerHTML = '';
-
+            
             results.forEach(data => {
                 const tagCard = document.createElement('div');
                 const relativeTagRating = avgRating === 0 ? 0 : (data.rating - avgRating) / avgRating * 100;
@@ -328,8 +328,6 @@ async function loadAnalysis(userId) {
                     tagCard.classList.add('normal');
                     gridNormal.appendChild(tagCard);
                 }
-
-                chrome.storage.local.set({[`weakTags_${userId}`] : weakTagsForRecommned});
                 
                 let korTags = [];
                 data.keys.forEach((engTag) => {
@@ -341,17 +339,20 @@ async function loadAnalysis(userId) {
                 tagCard.innerHTML = `
                 <span class="tag-name">${data.name}</span>
                 <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 5px;">
-                    <img src="${data.tierInfo.badgeUrl}" alt="${data.tierInfo.name}" style="height: 20px; transform: translateY(1px);">
-                    <span class="tag-tier" style="color: ${data.tierInfo.color}; display: inline-block; line-height: 1;">
-                        ${data.rating}
-                    </span>
+                <img src="${data.tierInfo.badgeUrl}" alt="${data.tierInfo.name}" style="height: 20px; transform: translateY(1px);">
+                <span class="tag-tier" style="color: ${data.tierInfo.color}; display: inline-block; line-height: 1;">
+                ${data.rating}
+                </span>
                 </div>
-
+                
                 <div class="tag-tooltip">
-                    <span class="tooltip-tags">${hashTags}</span>
+                <span class="tooltip-tags">${hashTags}</span>
                 </div>
                 `;
             });
+            
+            chrome.storage.local.set({[`weakTags_${userId}`] : weakTagsForRecommned});
+            
             let summaryText = '';
             if (weakTags.length > 0 && strongTags.length > 0) {
                 summaryText = `🔥 <b>${weakTags.join(', ')}</b> 보완이 필요하지만,<br>💪 <b>${strongTags.join(', ')}</b> 분야는 훌륭해요!`;
@@ -366,7 +367,6 @@ async function loadAnalysis(userId) {
 
             spinner.style.display = 'none';
             resultBox.style.display = 'block';
-
         } catch (error) {
             console.error("분석 중 에러 발생:", error);
             spinner.innerHTML = '<p>❌ 데이터를 분석하는 중 오류가 발생했습니다.</p>';
