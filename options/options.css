@@ -368,6 +368,18 @@ body.options-body {
 .tag-card.normal .tag-badge { background-color: #f8fcff; border: 1px solid #d3e1eb; }
 .tag-card.weak .tag-badge { background-color: #ffeeee; border: 1px solid #ffc9c9; }
 
+.analysis-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.analysis-panel .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .inner-panel {
     flex: 1;
     display: flex;
@@ -422,6 +434,45 @@ body.options-body {
     background-color: white;
     border-radius: 20px;
     transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.extra-panel {
+    width: 100%;
+    margin-top: 20px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #eee;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.extra-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.extra-icon {
+    font-size: 32px;
+}
+
+.extra-text {
+    text-align: left;
+}
+
+.extra-text h3 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--primary-color);
+}
+
+.extra-text p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #888;
 }
 
 .toggle-container:not(.custom-mode) .toggle-option[data-type="default"] { color: #333; }
