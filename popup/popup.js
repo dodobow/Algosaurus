@@ -57,7 +57,12 @@ async function handleSearch(inputField, resultDiv) {
         });
         
         const tierInfo = calculateTierInfo(data.tier);
-        updateResultUI(resultDiv, data, tierInfo);
+
+        const goalKey = `goal_${data.handle}`;
+        const diffKey = `diff_${data.handle}`;
+        const storedData = await getStorageData([goalKey, diffKey]);
+
+        updateResultUI(resultDiv, data, tierInfo, storedData[goalKey], storedData[diffKey]);
 
         const recommendSection = document.getElementById('recommend-section');
         if (recommendSection) {
@@ -78,16 +83,53 @@ async function fetchSolvedData(userId) {
     return await response.json();
 }
 
-function updateResultUI(targetDiv, userData, tierInfo) {
+function updateResultUI(targetDiv, userData, tierInfo, userGoal, userDiff) {
+    let rightSideHtml = '';
+    
+    if (!userGoal) {
+        rightSideHtml = `
+        <div class="goal-empty">
+            <span>목표를 먼저</span>
+            <span>설정해주세요!</span>
+        </div>`;
+    } else {
+        const recommendRange = calculateRecommendTier(userData.tier, userGoal, parseInt(userDiff || '0'));
+        const loInfo = calculateTierInfo(recommendRange.lo);
+        const hiInfo = calculateTierInfo(recommendRange.hi);
+        
+        const goalMap = {
+            'beginner': '코딩 입문 🐣',
+            'job': '취업 준비 💼',
+            'contest': '대회 준비 🏆'
+        };
+        const goalText = goalMap[userGoal] || '목표 설정됨';
+
+        rightSideHtml = `
+        <div class="goal-profile">
+            <div class="goal-label">현재 목표</div>
+            <div class="goal-value">${goalText}</div>
+            <div class="goal-label" style="margin-top: 6px;">추천 난이도</div>
+            <div class="tier-range">
+                <span style="color: ${loInfo.color}; font-weight: bold;">${loInfo.name}</span>
+                <span class="range-tilde">~</span>
+                <span style="color: ${hiInfo.color}; font-weight: bold;">${hiInfo.name}</span>
+            </div>
+        </div>`;
+    }
+
     targetDiv.innerHTML = `
-    <div>
-        <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">${userData.handle}</div>
-        <div style="font-size: 14px; color: #666;">
-            레이팅 : <span style="color: ${tierInfo.color}; font-weight: bold;">${userData.rating}</span>
+    <div class="result-layout">
+        <div class="user-profile">
+            <div class="user-handle">${userData.handle}</div>
+            <div class="user-stat">
+                레이팅 <span class="stat-value" style="color: ${tierInfo.color};">${userData.rating}</span>
+            </div>
+            <div class="user-stat">
+                티어 <span class="stat-value" style="color: ${tierInfo.color};">${tierInfo.name}</span>
+            </div>
         </div>
-        <div style="font-size: 14px; color: #666;">
-            티어 : <span style="color: ${tierInfo.color}; font-weight: bold;">${tierInfo.name}</span>
-        </div>
+        <div class="result-divider"></div>
+        ${rightSideHtml}
     </div>
     `;
 }
@@ -123,7 +165,7 @@ async function recommendProblem(userTier) {
         const recommendedProblem = data.items[0];
         problemDiv.innerHTML = `
             <a href="https://www.acmicpc.net/problem/${recommendedProblem.problemId}" target="_blank" class="problem-link">
-                <span style="font-weight:bold; color:#0078FF;">${recommendedProblem.problemId}번</span>
+                <span class="problem-id">${recommendedProblem.problemId}번</span>
                 <span>${recommendedProblem.titleKo}</span>
             </a>
         `;
@@ -178,7 +220,7 @@ async function recommendedProblemByWeakTags(userTier) {
                 const recommendedProblem = data.items[0];
                 problemDiv.innerHTML = `
                     <a href="https://www.acmicpc.net/problem/${recommendedProblem.problemId}" target="_blank" class="problem-link">
-                        <span style="font-weight:bold; color:#0078FF;">${recommendedProblem.problemId}번</span>
+                        <span class="problem-id">${recommendedProblem.problemId}번</span>
                         <span>${recommendedProblem.titleKo}</span>
                     </a>
                 `;
