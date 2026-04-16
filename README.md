@@ -33,7 +33,7 @@
 
 | **팝업 메인 (Popup)** | **설정 페이지 (Options)** |
 |:---:|:---:|
-| <img src="./assets/preview_popup.JPG" width="300"> | <img src="./assets/preview_option.JPG" width="600"> |
+| <img src="./assets/preview_popup.png" width="300"> | <img src="./assets/preview_option.png" width="600"> |
 | 내 티어 확인 및 문제 뽑기 | 목표 설정 및 난이도 조절 |
 
 <br/>
