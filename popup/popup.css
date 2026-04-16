@@ -32,7 +32,7 @@
     position: absolute;
     right: 0;
     background-color: white;
-    border: 1px solid #e9ecef;
+    border: none;
     border-radius: 20px;
     padding: 6px 12px;
     font-size: 12px;
@@ -47,7 +47,6 @@
     background-color: var(--primary-light);
     border-color: var(--primary-color);
     color: var(--primary-hover);
-    transform: translateY(-1px);
 }
 
 .input-group {
@@ -201,33 +200,24 @@
     padding: 14px 10px;
     border-radius: 12px;
     font-weight: 700;
+    background-color: white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     border: none;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-}
-
-.btn-group #recommendBtn {
-    background-color: var(--primary-light);
-    color: var(--primary-color);
+    color: #212529;
 }
 
 .btn-group #recommendBtn:hover {
     background-color: var(--primary-light-hover);
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px var(--primary-shadow);
-}
-
-.btn-group .weak-btn {
-    background-color: var(--weak-light);
-    color: var(--weak-color);
 }
 
 .btn-group .weak-btn:hover {
     background-color: var(--weak-hover);
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px var(--weak-shadow);
 }
 

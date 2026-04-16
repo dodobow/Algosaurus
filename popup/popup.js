@@ -89,6 +89,7 @@ function updateResultUI(targetDiv, userData, tierInfo, userGoal, userDiff) {
     if (!userGoal) {
         rightSideHtml = `
         <div class="goal-empty">
+            <span>My Page에서</span>
             <span>목표를 먼저</span>
             <span>설정해주세요!</span>
         </div>`;
