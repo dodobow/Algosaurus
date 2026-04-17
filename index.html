@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알고사우루스 아카이브</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js for Radar Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas for Image Export -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body class="options-body">
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <div class="header-text-block">
+                <p>알고사우루스 - Solved.ac 기반 PS 분석 솔루션</p>
+                <h1 id="dashboard-title">백준 데이터 아카이브 - 나의 내실과 목표별 강점 / 약점은?</h1>
+            </div>
+            <div class="header-logo-block">
+                <img src="assets/algoIcon128.png" alt="Algosaurus Logo" class="header-logo-img">
+            </div>
+        </header>
+
+        <section class="card">
+            <div class="card-body">
+                <div class="input-group">
+                    <input type="text" id="handle-input" placeholder="백준 핸들 (아이디) 입력">
+                    <button id="search-btn">분석하기 🔍</button>
+                </div>
+                <div id="status-message" class="status-msg">아이디를 입력하고 분석을 시작해보세요!</div>
+            </div>
+        </section>
+
+        <!-- 캡쳐(이미지 저장) 영역 -->
+        <div id="capture-area">
+            <div class="report-header">
+                <img id="user-tier-badge" src="" alt="Tier Badge" class="user-tier-badge" width="80" height="80">
+                <div class="user-info-group">
+                    <h2 id="report-title">사용자 리포트</h2>
+                    <p id="user-stat-msg" class="user-stat-msg"></p>
+                    <p class="memorial-msg">치열하게 고민했던 당신의 알고리즘 여정을 영원히 기억하며 🌟</p>
+                </div>
+            </div>
+            
+            <section class="card inner-panel">
+                <div class="card-header">
+                    <h2>📚 내실 검사 결과</h2>
+                </div>
+                <div class="card-body">
+                    <p class="subtitle">상위 200문제의 난이도를 분석한 결과입니다.</p>
+                    <div class="summary-box" id="inner-comment"></div>
+                    <div class="score-display">내실 점수: <span id="inner-score">0</span>점</div>
+                </div>
+            </section>
+
+            <div id="all-tags-container">
+                <!-- JS가 4개의 분석 카드를 여기에 동적으로 생성합니다. -->
+            </div>
+        </div>
+        
+        <button id="save-btn" class="save-btn" style="display: none;">결과 이미지로 저장하기 📸</button>
+        
+        <footer class="site-footer">
+            <p>Developed with 🦖 by <a href="https://github.com/dodobow" target="_blank" rel="noopener noreferrer">@dodobow</a></p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
