@@ -179,7 +179,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 메인 타이틀을 아카이브 감성으로 동적 변경 (index.html 역할 대체)
     const dashboardTitle = document.getElementById('dashboard-title');
-    if (dashboardTitle) dashboardTitle.innerHTML = '백준 데이터 아카이브 - 나의 알고리즘 여정과 소중한 기록들';
+    if (dashboardTitle) {
+        dashboardTitle.innerHTML = `
+            <span class="title-line title-line-top">데이터 아카이브</span>
+            <span class="title-line title-line-bottom">나의 알고리즘 여정과 소중한 기록들</span>
+        `;
+    }
 
     document.getElementById('save-btn').addEventListener('click', captureAndSave);
 });
