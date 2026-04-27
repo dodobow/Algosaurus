@@ -501,6 +501,21 @@ async function captureAndSave() {
     const captureArea = document.getElementById('capture-area');
     const saveBtn = document.getElementById('save-btn');
     const originalBtnText = saveBtn.innerText;
+
+    // 모바일에서도 선명도를 유지하기 위해 기기 픽셀 비율과 캔버스 한계를 함께 고려합니다.
+    const dpr = window.devicePixelRatio || 1;
+    const maxScaleByDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 3 : 4;
+    const width = captureArea.scrollWidth || captureArea.clientWidth;
+    const height = captureArea.scrollHeight || captureArea.clientHeight;
+    const maxCanvasPixels = 16_000_000;
+
+    let captureScale = Math.min(maxScaleByDevice, Math.max(2, dpr));
+    const estimatedPixels = width * height * captureScale * captureScale;
+    if (estimatedPixels > maxCanvasPixels) {
+        captureScale = Math.max(1.5, Math.sqrt(maxCanvasPixels / Math.max(width * height, 1)));
+    }
+
+    const rasterScale = Math.max(2, captureScale);
     
     // UX: 버튼 상태 변경 및 클릭 방지
     saveBtn.innerText = '이미지 생성 중... ⏳';
@@ -532,9 +547,11 @@ async function captureAndSave() {
                     const tempImg = new Image();
                     tempImg.onload = () => {
                         const canvas = document.createElement('canvas');
-                        canvas.width = width * 2; // 선명한 캡쳐를 위해 해상도 2배 뻥튀기
-                        canvas.height = height * 2;
+                        canvas.width = Math.round(width * rasterScale);
+                        canvas.height = Math.round(height * rasterScale);
                         const ctx = canvas.getContext('2d');
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
                         ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
                         resolve(canvas.toDataURL('image/png'));
                     };
@@ -575,7 +592,7 @@ async function captureAndSave() {
     // 4. html2canvas 실행
     try {
         const canvas = await html2canvas(captureArea, {
-            scale: 2, // 고해상도 캡쳐
+            scale: captureScale,
             useCORS: true,
             backgroundColor: '#f8f9fa'
         });
