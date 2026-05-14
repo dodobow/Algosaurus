@@ -431,6 +431,18 @@ input[type="text"]:disabled {
     background-color: var(--primary-hover);
 }
 
+.save-mobile-notice {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #fff7e8;
+    border: 1px solid #ffe0a8;
+    color: #865a00;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: left;
+}
+
 /* Footer */
 .site-footer {
     margin-top: 40px;
@@ -566,6 +578,10 @@ input[type="text"]:disabled {
 
     .chart-container {
         height: 310px;
+    }
+
+    .save-mobile-notice {
+        display: block;
     }
 }
 

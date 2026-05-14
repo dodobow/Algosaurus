@@ -195,6 +195,7 @@ async function runAnalysis() {
     const statusMsg = document.getElementById('status-message');
     const captureArea = document.getElementById('capture-area');
     const saveBtn = document.getElementById('save-btn');
+    const saveMobileNotice = document.getElementById('save-mobile-notice');
     const reportTitle = document.getElementById('report-title');
     const searchBtn = document.getElementById('search-btn');
 
@@ -207,6 +208,7 @@ async function runAnalysis() {
 
     captureArea.style.display = 'none';
     saveBtn.style.display = 'none';
+    if (saveMobileNotice) saveMobileNotice.style.display = 'none';
     searchBtn.disabled = true;
     handleInput.disabled = true;
 
@@ -295,6 +297,7 @@ async function runAnalysis() {
         statusMsg.innerHTML = '✅ 분석 완료!';
         captureArea.style.display = 'block';
         saveBtn.style.display = 'block';
+        if (saveMobileNotice) saveMobileNotice.style.display = 'block';
 
     } catch (error) {
         console.error(error);
