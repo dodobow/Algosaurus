@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from .api import ApiError, SolvedApi
 from .service import Service
+from .config import load_env
 
 
 def handler_for(service, extension_ids=()):
@@ -67,12 +68,15 @@ def handler_for(service, extension_ids=()):
                 self.reply(500, {"error": {"code": "INTERNAL_ERROR", "message": "서버 처리 중 오류가 발생했어."}})
 
         def feature(self, path, params):
+            if path == "/api/recommend" and {"handle"} <= set(params) <= {"handle", "goal", "difficulty", "mode", "weak"}:
+                return service.recommend(params)
             raise ApiError(404, "NOT_FOUND", "지원하지 않는 기능이야.")
 
     return Handler
 
 
 def main():
+    load_env()
     port = int(os.environ.get("PORT", "8765"))
     api = SolvedApi(os.environ.get("SOLVED_CLIENT_ID", ""), os.environ.get("SOLVED_CLIENT_SECRET", ""))
     ids = tuple(filter(None, os.environ.get("ALLOWED_EXTENSION_IDS", "").split(",")))

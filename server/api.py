@@ -72,6 +72,7 @@ class SolvedApi:
                     404: "계정이나 문제를 찾을 수 없어. solved.ac 핸들을 확인해 줘.",
                     429: "solved.ac 호출 제한에 도달했어. 안내한 시간 뒤 다시 시도해 줘.",
                 }
+                exc.close()
                 raise ApiError(exc.code if exc.code in messages else 502,
                                f"UPSTREAM_{exc.code}", messages.get(exc.code, "solved.ac 응답에 실패했어."), retry) from None
             except (URLError, TimeoutError, OSError):

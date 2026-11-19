@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="../common.css">
@@ -13,7 +13,7 @@
         </div>
         
         <div class="input-group">
-            <input type="text" id="solvedId" placeholder="백준 핸들 입력">
+            <input type="text" id="solvedId" placeholder="solved.ac 핸들 입력" aria-label="solved.ac 핸들" maxlength="64">
             <button id="loginBtn">조회</button>
         </div>
 
@@ -29,7 +29,6 @@
             <div id="problem-view" class="problem-view-box"></div>
         </div>
         
-        <script src="../utils.js"></script>
-        <script src="popup.js"></script>
+        <script type="module" src="popup.js"></script>
     </body>
 </html>

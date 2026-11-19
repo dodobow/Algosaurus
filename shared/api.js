@@ -32,4 +32,8 @@ export async function request(path, params = {}, { signal } = {}) {
 
 export const api = {
     profile: (handle, options) => request('/api/profile', { handle }, options),
+    recommend: (settings, weak = false, options) => request('/api/recommend', {
+        handle: settings.handle, goal: settings.goal, difficulty: settings.difficulty,
+        mode: settings.mode, weak: weak ? 'true' : 'false',
+    }, options),
 };
