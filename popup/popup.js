@@ -1,5 +1,5 @@
 import { api } from '../shared/api.js';
-import { readSettings, contextKey } from '../shared/storage.js';
+import { readSettings, contextKey, accountSelection } from '../shared/storage.js';
 import { $, LatestRequest, showError, textElement, profileText } from '../shared/ui.js';
 import { calculateTierInfo, calculateRecommendTier } from '../utils.js';
 
@@ -26,7 +26,9 @@ async function search() {
         const data = await api.profile(handle, request);
         if (!request.current()) return;
         pendingSelection = data.handle;
-        await chrome.storage.local.set({ solvedId: data.handle, accountVersion: 4 });
+        const previous = await chrome.storage.local.get(null);
+        if (!request.current()) return;
+        await chrome.storage.local.set(accountSelection(data, previous));
         pendingSelection = null;
         if (!request.current()) return;
         if ((await readSettings()).handle !== data.handle || !request.current()) return;
@@ -64,10 +66,13 @@ async function recommend(weak) {
         const latest = await readSettings();
         if (!request.current() || profile !== data || contextKey(settings) !== contextKey(latest)) return;
         if (!result.problem) {
-            $('problem-view').textContent = result.reason === 'NO_WEAK_TAGS' ? '현재 분석에서 약점 태그가 없어.' : '이 조건에 맞는 추천 문제가 없어. 난이도를 조정해 봐.';
+            $('problem-view').textContent = result.reason === 'NO_WEAK_TAGS' ? '현재 분석에서 약점 태그가 없어.' :
+                result.reason === 'NO_WEAK_RESULTS' ? '이번에 검색한 약점 태그(최대 3개)에 맞는 문제가 없어. 난이도를 조정해 봐.' :
+                    '이번 검색에서 열 수 있는 추천 문제가 없어. 난이도를 조정하거나 다시 추천받아 줘.';
             return;
         }
         const problem = result.problem;
+        if (result.profileId !== data.id || result.handle !== data.handle) throw new Error('조회 중 계정 정보가 바뀌었어. 프로필을 다시 조회해 줘.');
         const link = textElement('a', `BOJ ${problem.bojProblemId} · ${problem.title}`, 'problem-link');
         if (!/^https:\/\/(?:www\.)?acmicpc\.net\/problem\/\d+$/.test(problem.url)) throw new Error('BOJ 문제 링크가 올바르지 않아.');
         link.href = problem.url;
@@ -104,7 +109,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const settings = await readSettings();
     if (settings.handle && !$('solvedId').value) {
         $('solvedId').value = settings.handle;
-        await search();
+        const raw = await chrome.storage.local.get(['accountVersion']);
+        if (raw.accountVersion === 4) await search();
+        else $('result').textContent = '기존 ID는 BOJ 핸들일 수 있어. solved.ac 핸들을 확인하고 조회를 눌러 줘. 목표·난이도 설정은 보존돼.';
     } else if (!settings.handle) {
         $('result').textContent = 'solved.ac 핸들을 입력해 줘. BOJ 핸들과 다를 수 있어.';
     }

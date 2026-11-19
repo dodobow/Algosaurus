@@ -1,8 +1,11 @@
 import unittest
+import json
+import subprocess
+from pathlib import Path
 
 from server.api import ApiError
 from server.service import Service, recommend_range
-from fixtures import FixtureApi
+from tests.fixtures import FixtureApi
 
 
 class RecommendationTests(unittest.TestCase):
@@ -57,3 +60,17 @@ class RecommendationTests(unittest.TestCase):
         with self.assertRaises(ApiError) as ctx:
             self.service.recommend({'handle': 'solved_name'})
         self.assertEqual(ctx.exception.code, 'TIER_UNAVAILABLE')
+
+    def test_extension_preview_and_server_ranges_agree_for_all_settings(self):
+        script = """
+import { calculateRecommendTier } from './utils.js';
+const rows = [];
+for (let tier = 0; tier <= 31; tier++) for (const goal of ['beginner', 'job', 'contest']) for (let diff = -2; diff <= 2; diff++) {
+  rows.push([tier, goal, diff, calculateRecommendTier(tier, goal, diff)]);
+}
+console.log(JSON.stringify(rows));
+"""
+        output = subprocess.run(['node', '--input-type=module', '-e', script], check=True,
+                                capture_output=True, text=True, cwd=Path(__file__).resolve().parents[1])
+        for tier, goal, diff, expected in json.loads(output.stdout):
+            self.assertEqual(recommend_range(tier, goal, diff), (expected['lo'], expected['hi']))

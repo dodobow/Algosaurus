@@ -7,7 +7,7 @@ from http.server import ThreadingHTTPServer
 from server.api import SolvedApi
 from server.app import handler_for
 from server.service import Service
-from fixtures import FixtureApi
+from tests.fixtures import FixtureApi
 
 
 class HttpTests(unittest.TestCase):
@@ -57,6 +57,15 @@ class HttpTests(unittest.TestCase):
         self.assertEqual(status, 429)
         self.assertEqual(data['error']['retryAfter'], 30)
         self.assertEqual(headers['Retry-After'], '30')
+
+    def test_analysis_then_weak_recommendation(self):
+        status, analysis, _ = self.get('/api/analysis?handle=solved_name&goal=job&difficulty=0&mode=custom')
+        self.assertEqual(status, 200)
+        self.assertEqual(len(analysis['groups']), 10)
+        status, recommendation, _ = self.get('/api/recommend?handle=solved_name&goal=job&difficulty=0&mode=custom&weak=true')
+        self.assertEqual(status, 200)
+        self.assertIsNotNone(recommendation['problem'])
+        self.assertIsNotNone(recommendation['problem']['tag'])
 
     def test_missing_credentials_is_actionable(self):
         with self.assertRaises(Exception) as ctx:
