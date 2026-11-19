@@ -1,6 +1,3 @@
-export const ANALYSIS_VERSION = 4;
-export const WEAK_TTL = 15 * 60 * 1000;
-
 export function normalizeSettings(raw, handle = raw.solvedId || '') {
     const goal = raw[`goal_${handle}`];
     const diff = Number(raw[`diff_${handle}`] ?? 0);
@@ -16,6 +13,21 @@ export function contextKey(settings) {
     return JSON.stringify([settings.handle, settings.goal, settings.difficulty, settings.mode]);
 }
 
+export function accountSelection(profile, raw) {
+    const values = { solvedId: profile.handle, accountVersion: 4 };
+    const old = raw.solvedId;
+    const linked = profile.ojAccounts.some(account => account.ojId === 'boj' && account.verified === true &&
+        account.handle.toLowerCase() === String(old).toLowerCase());
+    if (raw.accountVersion !== 4 && old && old !== profile.handle && linked) {
+        for (const prefix of ['goal_', 'diff_', 'mode_']) {
+            if (raw[prefix + profile.handle] === undefined && raw[prefix + old] !== undefined) {
+                values[prefix + profile.handle] = raw[prefix + old];
+            }
+        }
+    }
+    return values;
+}
+
 export async function readSettings(handle) {
     const raw = await chrome.storage.local.get(null);
     return normalizeSettings(raw, handle ?? raw.solvedId ?? '');
@@ -28,14 +40,4 @@ export async function saveSettings(handle, changes) {
         if (names[key]) values[`${names[key]}_${handle}`] = key === 'mode' ? value === 'custom' : value;
     }
     await chrome.storage.local.set(values);
-}
-
-export function weakCacheKey(settings) {
-    return `analysis_v${ANALYSIS_VERSION}_${contextKey(settings)}`;
-}
-
-export function validWeakCache(cache, profileId, now = Date.now()) {
-    return cache?.version === ANALYSIS_VERSION && cache.profileId === profileId &&
-        Number.isFinite(cache.createdAt) && now >= cache.createdAt && now - cache.createdAt < WEAK_TTL &&
-        Array.isArray(cache.keys) && cache.keys.every(key => typeof key === 'string');
 }

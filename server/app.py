@@ -68,6 +68,8 @@ def handler_for(service, extension_ids=()):
                 self.reply(500, {"error": {"code": "INTERNAL_ERROR", "message": "서버 처리 중 오류가 발생했어."}})
 
         def feature(self, path, params):
+            if path == "/api/analysis" and {"handle"} <= set(params) <= {"handle", "goal", "difficulty", "mode"}:
+                return service.analyze(params)
             if path == "/api/recommend" and {"handle"} <= set(params) <= {"handle", "goal", "difficulty", "mode", "weak"}:
                 return service.recommend(params)
             raise ApiError(404, "NOT_FOUND", "지원하지 않는 기능이야.")
