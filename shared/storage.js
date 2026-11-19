@@ -1,0 +1,41 @@
+export const ANALYSIS_VERSION = 4;
+export const WEAK_TTL = 15 * 60 * 1000;
+
+export function normalizeSettings(raw, handle = raw.solvedId || '') {
+    const goal = raw[`goal_${handle}`];
+    const diff = Number(raw[`diff_${handle}`] ?? 0);
+    return {
+        handle,
+        goal: ['beginner', 'job', 'contest'].includes(goal) ? goal : 'contest',
+        difficulty: Number.isInteger(diff) ? Math.max(-2, Math.min(2, diff)) : 0,
+        mode: raw[`mode_${handle}`] === true ? 'custom' : 'default',
+    };
+}
+
+export function contextKey(settings) {
+    return JSON.stringify([settings.handle, settings.goal, settings.difficulty, settings.mode]);
+}
+
+export async function readSettings(handle) {
+    const raw = await chrome.storage.local.get(null);
+    return normalizeSettings(raw, handle ?? raw.solvedId ?? '');
+}
+
+export async function saveSettings(handle, changes) {
+    const names = { goal: 'goal', difficulty: 'diff', mode: 'mode' };
+    const values = {};
+    for (const [key, value] of Object.entries(changes)) {
+        if (names[key]) values[`${names[key]}_${handle}`] = key === 'mode' ? value === 'custom' : value;
+    }
+    await chrome.storage.local.set(values);
+}
+
+export function weakCacheKey(settings) {
+    return `analysis_v${ANALYSIS_VERSION}_${contextKey(settings)}`;
+}
+
+export function validWeakCache(cache, profileId, now = Date.now()) {
+    return cache?.version === ANALYSIS_VERSION && cache.profileId === profileId &&
+        Number.isFinite(cache.createdAt) && now >= cache.createdAt && now - cache.createdAt < WEAK_TTL &&
+        Array.isArray(cache.keys) && cache.keys.every(key => typeof key === 'string');
+}
