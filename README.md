@@ -53,8 +53,29 @@
 ## 🛠️ 기술 스택 (Tech Stack)
 
 - **Frontend:** HTML, CSS, JavaScript (Vanilla)
-- **API:** [Solved.ac API](https://solvedac.github.io/unofficial-documentation/)
+- **API:** [solved.ac 공식 API v4](https://backstage.solved.ac/ko/developer/docs)
 - **Platform:** Chrome Extension Manifest V3
+
+## API 서버 (v4 전환 기반)
+
+Python 3.11 이상이 필요합니다. 별도 Python 패키지는 없습니다.
+Backstage에서 앱을 등록하고 PowerShell 환경변수로 인증정보를 지정합니다.
+`.env.example`은 참고용이며 자동으로 로드하지 않습니다.
+
+```powershell
+$env:SOLVED_CLIENT_ID = '<앱 ID>'
+$env:SOLVED_CLIENT_SECRET = '<앱 시크릿>'
+python -m server.app
+```
+
+서버는 `http://127.0.0.1:8765`에만 열립니다. 시크릿을 확장 코드나 Git에 넣지 마세요.
+공개 프로필과 문제 검색에는 사용자 OAuth가 필요하지 않습니다.
+설계 근거와 호출 제한은 [v4 전환 문서](docs/api-v4.md)를 참고하세요.
+
+```powershell
+python -m unittest discover -s tests -p 'test_*.py' -v
+npm test
+```
 
 <br/>
 
