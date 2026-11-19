@@ -1,236 +1,111 @@
-let cachedUserData = null;
+import { api } from '../shared/api.js';
+import { readSettings, contextKey } from '../shared/storage.js';
+import { $, LatestRequest, showError, textElement, profileText } from '../shared/ui.js';
+import { calculateTierInfo, calculateRecommendTier } from '../utils.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    const loginButton = document.getElementById('loginBtn');
-    const inputField = document.getElementById('solvedId');
-    const resultDiv = document.getElementById('result');
-    const recommendButton = document.getElementById('recommendBtn');
-    const recommendByWeakTagsButton = document.getElementById('weakRecommendBtn');
-    const settingButton = document.getElementById('settingBtn');
+const searchRequest = new LatestRequest();
+const recommendationRequest = new LatestRequest();
+let profile = null;
+let pendingSelection = null;
 
-    loginButton.addEventListener('click', () => handleSearch(inputField, resultDiv));
+function clearProfile() {
+    searchRequest.cancel();
+    recommendationRequest.cancel();
+    profile = null;
+    $('recommend-section').style.display = 'none';
+    $('problem-view').replaceChildren();
+}
 
-    inputField.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') handleSearch(inputField, resultDiv);
+async function search() {
+    clearProfile();
+    const handle = $('solvedId').value.trim();
+    if (!handle) { $('result').textContent = 'solved.ac 핸들을 입력해 줘. BOJ 핸들과 다를 수 있어.'; return; }
+    const request = searchRequest.start();
+    $('result').textContent = '프로필 조회 중...';
+    try {
+        const data = await api.profile(handle, request);
+        if (!request.current()) return;
+        pendingSelection = data.handle;
+        await chrome.storage.local.set({ solvedId: data.handle, accountVersion: 4 });
+        pendingSelection = null;
+        if (!request.current()) return;
+        if ((await readSettings()).handle !== data.handle || !request.current()) return;
+        profile = data;
+        await renderProfile(request);
+    } catch (error) {
+        pendingSelection = null;
+        if (request.current() && error.name !== 'AbortError') showError($('result'), error);
+    }
+}
+
+async function renderProfile(request) {
+    const data = profile;
+    const settings = await readSettings(data.handle);
+    if (!request.current() || data !== profile) return;
+    const tier = calculateTierInfo(data.tier);
+    const range = calculateRecommendTier(data.tier, settings.goal, settings.difficulty);
+    $('result').replaceChildren(
+        textElement('p', profileText(data)),
+        textElement('p', `${tier.name} · 레이팅 ${data.rating} · 해결 ${data.solvedCount}문제`),
+        textElement('p', range ? `${{ beginner: '입문', job: '취업', contest: '대회' }[settings.goal]} · ${calculateTierInfo(range.lo).name} ~ ${calculateTierInfo(range.hi).name}` : '티어 비공개: 추천 범위를 계산할 수 없어.'),
+    );
+    $('recommend-section').style.display = range ? 'block' : 'none';
+}
+
+async function recommend(weak) {
+    if (!profile) return;
+    const request = recommendationRequest.start();
+    const data = profile;
+    const settings = await readSettings(data.handle);
+    if (!request.current()) return;
+    $('problem-view').textContent = '안 푼 BOJ 문제 찾는 중...';
+    try {
+        const result = await api.recommend(settings, weak, request);
+        const latest = await readSettings();
+        if (!request.current() || profile !== data || contextKey(settings) !== contextKey(latest)) return;
+        if (!result.problem) {
+            $('problem-view').textContent = result.reason === 'NO_WEAK_TAGS' ? '현재 분석에서 약점 태그가 없어.' : '이 조건에 맞는 추천 문제가 없어. 난이도를 조정해 봐.';
+            return;
+        }
+        const problem = result.problem;
+        const link = textElement('a', `BOJ ${problem.bojProblemId} · ${problem.title}`, 'problem-link');
+        if (!/^https:\/\/(?:www\.)?acmicpc\.net\/problem\/\d+$/.test(problem.url)) throw new Error('BOJ 문제 링크가 올바르지 않아.');
+        link.href = problem.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        $('problem-view').replaceChildren(link);
+    } catch (error) {
+        if (request.current() && error.name !== 'AbortError') showError($('problem-view'), error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    $('loginBtn').addEventListener('click', search);
+    $('solvedId').addEventListener('keydown', event => { if (event.key === 'Enter') search(); });
+    $('solvedId').addEventListener('input', () => {
+        clearProfile();
+        $('result').textContent = '입력한 solved.ac 핸들로 조회를 눌러 줘.';
     });
-
-    recommendButton.addEventListener('click', () => recommendProblem(cachedUserData.tier));
-
-    recommendByWeakTagsButton.addEventListener('click', () => recommendedProblemByWeakTags(cachedUserData.tier));
-
-    inputField.focus();
-
-    chrome.storage.local.get(['solvedId'], (result) => {
-        if (result.solvedId) {
-            inputField.value = result.solvedId;
-            handleSearch(inputField, resultDiv);
+    $('settingBtn').addEventListener('click', () => chrome.runtime.openOptionsPage());
+    $('recommendBtn').addEventListener('click', () => recommend(false));
+    $('weakRecommendBtn').addEventListener('click', () => recommend(true));
+    chrome.storage.onChanged.addListener(async (changes, area) => {
+        if (area !== 'local') return;
+        if (changes.solvedId && changes.solvedId.newValue !== pendingSelection) {
+            clearProfile();
+            $('solvedId').value = changes.solvedId.newValue || '';
+            $('result').textContent = '선택 계정이 바뀌었어. 조회를 눌러 줘.';
+        } else if (profile && Object.keys(changes).some(key => ['goal_', 'diff_', 'mode_'].some(prefix => key === prefix + profile.handle))) {
+            recommendationRequest.cancel();
+            $('problem-view').textContent = '설정이 바뀌었어. 다시 추천받아 줘.';
+            await renderProfile(searchRequest.start());
         }
     });
-
-    if (settingButton) {
-        settingButton.addEventListener('click', () => {
-            if (chrome.runtime.openOptionsPage) {
-                chrome.runtime.openOptionsPage();
-            } else {
-                window.open(chrome.runtime.getURL('options/options.html'));
-            }
-        });
+    const settings = await readSettings();
+    if (settings.handle && !$('solvedId').value) {
+        $('solvedId').value = settings.handle;
+        await search();
+    } else if (!settings.handle) {
+        $('result').textContent = 'solved.ac 핸들을 입력해 줘. BOJ 핸들과 다를 수 있어.';
     }
 });
-
-async function handleSearch(inputField, resultDiv) {
-    const userId = inputField.value;
-    if (!userId) {
-        alert('ID를 입력해주세요.');
-        inputField.focus();
-        return;
-    }
-    try {
-        const data = await fetchSolvedData(userId);
-        cachedUserData = data;
-        chrome.storage.local.set({
-            solvedId : data.handle,
-            solvedTier : data.tier,
-            solvedRating : data.rating,
-            solvedCount : data.solvedCount,
-            solvedRatingByProblemsSum : data.ratingByProblemsSum
-        });
-        
-        const tierInfo = calculateTierInfo(data.tier);
-
-        const goalKey = `goal_${data.handle}`;
-        const diffKey = `diff_${data.handle}`;
-        const storedData = await getStorageData([goalKey, diffKey]);
-
-        updateResultUI(resultDiv, data, tierInfo, storedData[goalKey], storedData[diffKey]);
-
-        const recommendSection = document.getElementById('recommend-section');
-        if (recommendSection) {
-            recommendSection.style.display = 'block';
-        }
-    } catch (error) {
-        resultDiv.innerHTML = `<span style="color: red;">${error.message}</span>`;
-        document.getElementById('recommend-section').style.display = 'none';
-    }
-}
-
-async function fetchSolvedData(userId) {
-    const url = `https://solved.ac/api/v3/user/show?handle=${userId}`;
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('유저 정보를 가져올 수 없습니다.');
-    }
-    return await response.json();
-}
-
-function updateResultUI(targetDiv, userData, tierInfo, userGoal, userDiff) {
-    let rightSideHtml = '';
-    
-    if (!userGoal) {
-        rightSideHtml = `
-        <div class="goal-empty">
-            <span>My Page에서</span>
-            <span>목표를 먼저</span>
-            <span>설정해주세요!</span>
-        </div>`;
-    } else {
-        const recommendRange = calculateRecommendTier(userData.tier, userGoal, parseInt(userDiff || '0'));
-        const loInfo = calculateTierInfo(recommendRange.lo);
-        const hiInfo = calculateTierInfo(recommendRange.hi);
-        
-        const goalMap = {
-            'beginner': '코딩 입문 🐣',
-            'job': '취업 준비 💼',
-            'contest': '대회 준비 🏆'
-        };
-        const goalText = goalMap[userGoal] || '목표 설정됨';
-
-        rightSideHtml = `
-        <div class="goal-profile">
-            <div class="goal-label">현재 목표</div>
-            <div class="goal-value">${goalText}</div>
-            <div class="goal-label" style="margin-top: 6px;">추천 난이도</div>
-            <div class="tier-range">
-                <span style="color: ${loInfo.color}; font-weight: bold;">${loInfo.name}</span>
-                <span class="range-tilde">~</span>
-                <span style="color: ${hiInfo.color}; font-weight: bold;">${hiInfo.name}</span>
-            </div>
-        </div>`;
-    }
-
-    targetDiv.innerHTML = `
-    <div class="result-layout">
-        <div class="user-profile">
-            <div class="user-handle">${userData.handle}</div>
-            <div class="user-stat">
-                레이팅 <span class="stat-value" style="color: ${tierInfo.color};">${userData.rating}</span>
-            </div>
-            <div class="user-stat">
-                티어 <span class="stat-value" style="color: ${tierInfo.color};">${tierInfo.name}</span>
-            </div>
-        </div>
-        <div class="result-divider"></div>
-        ${rightSideHtml}
-    </div>
-    `;
-}
-
-async function recommendProblem(userTier) {
-    const problemDiv = document.getElementById('problem-view');
-    problemDiv.innerHTML = '문제 찾는 중...';
-    
-    try {
-        const userId = cachedUserData.handle;
-        const goalKey = `goal_${userId}`;
-        const diffKey = `diff_${userId}`;
-
-        const storedData = await getStorageData([goalKey, diffKey]);
-        const userGoal = storedData[goalKey];
-        const userDiff = storedData[diffKey] ? storedData[diffKey] : 0;
-
-        
-        const recommendRange = calculateRecommendTier(userTier, userGoal, parseInt(userDiff));
-        const queryString = `*${recommendRange.lo}..${recommendRange.hi} !@$me %ko s#100..`;
-        const url = `https://solved.ac/api/v3/search/problem?query=${encodeURIComponent(queryString)}&sort=random`;
-
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error('문제 정보를 가져올 수 없습니다.');
-        }
-        const data = await response.json();
-
-        if (data.count === 0) {
-            problemDiv.innerHTML = '추천할 문제가 다 떨어졌어요 😭';
-            return;
-        }
-        const recommendedProblem = data.items[0];
-        problemDiv.innerHTML = `
-            <a href="https://www.acmicpc.net/problem/${recommendedProblem.problemId}" target="_blank" class="problem-link">
-                <span class="problem-id">${recommendedProblem.problemId}번</span>
-                <span>${recommendedProblem.titleKo}</span>
-            </a>
-        `;
-    } catch (error) {
-        problemDiv.innerHTML = `<span style="color: red;">${error.message}</span>`;
-    }
-}
-
-function getStorageData(keys) {
-    return new Promise((resolve) => {
-        chrome.storage.local.get(keys, (result) => {
-            resolve(result);
-        });
-    });
-}
-
-async function recommendedProblemByWeakTags(userTier) {
-    const problemDiv = document.getElementById('problem-view');
-    problemDiv.innerHTML = '문제 찾는 중...';
-    
-    try {
-        const userId = cachedUserData.handle;
-        const goalKey = `goal_${userId}`;
-        const diffKey = `diff_${userId}`;
-        const weakTagsKey = `weakTags_${userId}`;
-
-        const storedData = await getStorageData([goalKey, diffKey, weakTagsKey]);
-        const userGoal = storedData[goalKey];
-        const userDiff = storedData[diffKey] ? storedData[diffKey] : 0;
-        
-        let userWeakTags = storedData[weakTagsKey];
-        if (userWeakTags.length === 0) {
-            problemDiv.innerHTML = '약점이 없거나 아직 대시보드에서 태그 분석이 이루어지지 않았어요!';
-            return;
-        }
-        userWeakTags.sort(() => Math.random() - 0.5);
-
-        const recommendTag = userWeakTags[0];
-        const recommendRange = calculateRecommendTier(userTier, userGoal, parseInt(userDiff));
-        
-        for (const tagQuery of [recommendTag, `(${userWeakTags.join(' | ')})`]) {
-            const queryString = `*${recommendRange.lo}..${recommendRange.hi} ${tagQuery} !@$me %ko s#100..`;
-            console.log(queryString);
-            const url = `https://solved.ac/api/v3/search/problem?query=${encodeURIComponent(queryString)}&sort=random`;
-
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('문제 정보를 가져올 수 없습니다.');
-            }
-            const data = await response.json();
-            if (data.items.length != 0) {
-                const recommendedProblem = data.items[0];
-                problemDiv.innerHTML = `
-                    <a href="https://www.acmicpc.net/problem/${recommendedProblem.problemId}" target="_blank" class="problem-link">
-                        <span class="problem-id">${recommendedProblem.problemId}번</span>
-                        <span>${recommendedProblem.titleKo}</span>
-                    </a>
-                `;
-                console.log(queryString);
-                console.log(url);
-                break;
-            }
-        }
-    } catch (error) {
-        problemDiv.innerHTML = `<span style="color: red;">${error.message}</span>`;
-    }
-}

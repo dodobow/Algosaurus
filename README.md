@@ -60,7 +60,7 @@
 
 Python 3.11 이상이 필요합니다. 별도 Python 패키지는 없습니다.
 Backstage에서 앱을 등록하고 PowerShell 환경변수로 인증정보를 지정합니다.
-`.env.example`은 참고용이며 자동으로 로드하지 않습니다.
+`.env.example`을 `.env`로 복사해 값을 넣어도 됩니다. 기존 환경변수가 우선합니다.
 
 ```powershell
 $env:SOLVED_CLIENT_ID = '<앱 ID>'
