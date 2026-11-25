@@ -5,6 +5,7 @@ from concurrent.futures import Future, TimeoutError as FutureTimeout
 from urllib.parse import quote
 
 from .api import ApiError
+from .cache import SharedCache
 from .analysis import canonical_groups, tag_queries, unique_rated, classify_groups, inner_score
 
 
@@ -65,11 +66,16 @@ class Service:
         self.lock = threading.Lock()
         self.analysis_cache = {}
         self.pending = {}
-        self.catalog = None
-        self.catalog_time = 0
+        self.tags = SharedCache(86400, 1)
+        self.profiles = SharedCache(30, 64)
+        self.pages = SharedCache(900, 512)
 
     def profile(self, handle):
-        data = self.api.get("/users/" + quote(handle_value(handle), safe=""))
+        handle = handle_value(handle)
+        return self.profiles.get(handle, lambda: self._profile(handle))
+
+    def _profile(self, handle):
+        data = self.api.get("/users/" + quote(handle, safe=""))
         if (not isinstance(data.get("id"), int) or not isinstance(data.get("handle"), str)
                 or not isinstance(data.get("ojAccounts"), list)
                 or not isinstance(data.get("rating"), int) or not isinstance(data.get("solvedCount"), int)
@@ -78,7 +84,7 @@ class Service:
         return data
 
     def weak_keys(self, profile, goal, difficulty, mode):
-        key = self.analysis_key(profile, goal, difficulty, mode)
+        key = self.analysis_key(profile, goal, mode)
         with self.lock:
             cached = self.analysis_cache.get(key)
         if not cached or time.monotonic() - cached[0] >= 900:
@@ -89,14 +95,21 @@ class Service:
         return list(dict.fromkeys(tag for group in groups for tag in group['keys']))
 
     @staticmethod
-    def analysis_key(profile, goal, difficulty, mode):
-        return (4, profile['id'], profile['handle'], goal, difficulty, mode)
+    def analysis_key(profile, goal, mode):
+        return (4, profile['id'], profile['handle'], mode, goal if mode == 'custom' else None)
 
-    def top_sets(self, query, limit):
+    def top_sets(self, query, limit, profile_id=None):
         problems, total = [], None
         for page in range(1, 17):
-            data = checked_page(self.api.get('/problems', q=query, sort='level', direction='desc', page=page))
+            def load_page():
+                data = checked_page(self.api.get('/problems', q=query, sort='level', direction='desc', page=page))
+                if data.get('page') != page:
+                    raise ApiError(502, 'INCOMPLETE_PAGE', '요청한 문제 페이지와 응답이 일치하지 않아.')
+                unique_rated(data['problems'])
+                return data
+            data = self.pages.get((4, profile_id, query, page), load_page)
             if data.get('page') != page or total is not None and total != data['total']:
+                self.pages.discard(lambda key: key[:3] == (4, profile_id, query))
                 raise ApiError(409, 'DATA_CHANGED', '분석 도중 풀이 목록이 바뀌었어. 다시 실행해 줘.')
             total = data['total']
             problems.extend(data['problems'])
@@ -109,11 +122,13 @@ class Service:
         handle, goal, difficulty, mode = settings_values(params)
         profile = self.profile(handle)
         canonical = handle_value(profile['handle'])
-        key = self.analysis_key(profile, goal, difficulty, mode)
+        key = self.analysis_key(profile, goal, mode)
+        def response(result):
+            return {**result, 'settings': {'goal': goal, 'difficulty': difficulty, 'mode': mode}}
         with self.lock:
             cached = self.analysis_cache.get(key)
             if cached and time.monotonic() - cached[0] < 900:
-                return cached[1]
+                return response(cached[1])
             if key in self.pending:
                 pending, owner = self.pending[key], False
             else:
@@ -122,30 +137,28 @@ class Service:
                 self.analysis_cache.pop(key, None)
         if not owner:
             try:
-                return pending.result(timeout=85)
+                return response(pending.result(timeout=85))
             except FutureTimeout:
                 raise ApiError(503, 'ANALYSIS_BUSY', '같은 설정의 분석이 진행 중이야. 잠시 후 다시 시도해 줘.') from None
         try:
-            with self.lock:
-                catalog = self.catalog if time.monotonic() - self.catalog_time < 86400 else None
-            if catalog is None:
+            def load_catalog():
                 catalog = self.api.get('/tags').get('tags')
                 if not isinstance(catalog, list):
                     raise ApiError(502, 'INVALID_TAGS', '태그 목록을 읽을 수 없어.')
-                with self.lock:
-                    self.catalog, self.catalog_time = catalog, time.monotonic()
+                return catalog
+            catalog = self.tags.get(4, load_catalog)
             groups = canonical_groups(catalog, mode, goal)
             official = {rating['key']: rating['rating'] for rating in profile.get('tagRatings', [])
                         if isinstance(rating.get('rating'), int)}
             for group in groups:
                 problems = []
                 for query in tag_queries(canonical, group['keys']):
-                    problems.extend(self.top_sets(query, 50))
+                    problems.extend(self.top_sets(query, 50, profile['id']))
                 best = unique_rated(problems)[:50]
                 group['score'] = sum(problem['level'] for problem in best)
                 group['count'] = len(best)
                 group['officialRating'] = official.get(group['keys'][0]) if len(group['keys']) == 1 else None
-            inner = inner_score(self.top_sets(f'@{canonical} rated:true', 200))
+            inner = inner_score(self.top_sets(f'@{canonical} rated:true', 200, profile['id']))
             result = {'version': 4, 'profileId': profile['id'], 'handle': canonical,
                       'settings': {'goal': goal, 'difficulty': difficulty, 'mode': mode},
                       'createdAt': int(time.time() * 1000), 'groups': classify_groups(groups), 'inner': inner}
@@ -154,7 +167,7 @@ class Service:
                 while len(self.analysis_cache) > 64:
                     del self.analysis_cache[next(iter(self.analysis_cache))]
             pending.set_result(result)
-            return result
+            return response(result)
         except Exception as exc:
             pending.set_exception(exc)
             raise

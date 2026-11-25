@@ -27,11 +27,12 @@ class ApiError(Exception):
 class SolvedApi:
     BASE = "https://solved.ac/api/v4"
 
-    def __init__(self, client_id="", client_secret="", transport=upstream_open, clock=time.monotonic):
+    def __init__(self, client_id="", client_secret="", transport=upstream_open, clock=time.monotonic, sleep=time.sleep):
         self.client_id = client_id
         self.client_secret = client_secret
         self.transport = transport
         self.clock = clock
+        self.sleep = sleep
         self.lock = threading.Lock()
         self.tokens = 60.0
         self.updated = clock()
@@ -86,11 +87,20 @@ class SolvedApi:
             self.slots.release()
 
     def _reserve(self, cost):
-        with self.lock:
-            now = self.clock()
-            self.tokens = min(60, self.tokens + max(0, now - self.updated))
-            self.updated = now
-            wait = max(self.blocked_until - now, cost - self.tokens)
-            if wait > 0:
-                raise ApiError(429, "RATE_LIMITED", "호출 제한 보호 중이야. 잠시 후 다시 시도해 줘.", math.ceil(wait))
-            self.tokens -= cost
+        deadline = self.clock() + 10
+        while True:
+            with self.lock:
+                now = self.clock()
+                self.tokens = min(60, self.tokens + max(0, now - self.updated))
+                self.updated = now
+                if self.blocked_until > now:
+                    raise ApiError(429, "UPSTREAM_COOLDOWN", "solved.ac 호출 제한의 대기 시간이 남아 있어.",
+                                   math.ceil(self.blocked_until - now))
+                wait = cost - self.tokens
+                if wait <= 0:
+                    self.tokens -= cost
+                    return
+                remaining = deadline - now
+                if remaining <= 0:
+                    raise ApiError(429, "RATE_LIMITED", "로컬 요청 대기가 길어졌어. 잠시 후 다시 시도해 줘.", math.ceil(wait))
+            self.sleep(min(wait, remaining))

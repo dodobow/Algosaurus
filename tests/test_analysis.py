@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import patch
 
 from server.analysis import canonical_groups, tag_queries, unique_rated, inner_score
-from server.api import ApiError
+from server.api import ApiError, SolvedApi
 from server.service import Service, checked_page
 from tests.fixtures import FixtureApi, problem
 
@@ -61,9 +61,9 @@ class AnalysisTests(unittest.TestCase):
         self.assertTrue(any(g['keys'] == ['impl'] for g in result['groups']))
         self.assertEqual(next(g for g in result['groups'] if g['keys'] == ['dp'])['officialRating'], 900)
         self.assertTrue(service.weak_keys(api.user, 'contest', 0, 'default'))
-        for args in [('job', 0, 'default'), ('contest', 1, 'default'), ('contest', 0, 'custom')]:
-            with self.assertRaises(ApiError):
-                service.weak_keys(api.user, *args)
+        self.assertTrue(service.weak_keys(api.user, 'job', 2, 'default'))
+        with self.assertRaises(ApiError):
+            service.weak_keys(api.user, 'contest', 0, 'custom')
         api.user['id'] = 18
         with self.assertRaises(ApiError):
             service.weak_keys(api.user, 'contest', 0, 'default')
@@ -97,7 +97,7 @@ class AnalysisTests(unittest.TestCase):
         api = FixtureApi()
         service = Service(api)
         service.analyze({'handle': 'solved_name'})
-        key = service.analysis_key(api.user, 'contest', 0, 'default')
+        key = service.analysis_key(api.user, 'contest', 'default')
         when, data = service.analysis_cache[key]
         service.analysis_cache[key] = (when - 901, data)
         with self.assertRaises(ApiError):
@@ -124,11 +124,119 @@ class AnalysisTests(unittest.TestCase):
                 waiting.set()
                 return original_result(*args, **kwargs)
             with patch.object(pending, 'result', wait_for_owner):
-                second = pool.submit(service.analyze, {'handle': 'solved_name'})
+                second = pool.submit(service.analyze, {'handle': 'solved_name', 'goal': 'job', 'difficulty': '2'})
                 self.assertTrue(waiting.wait(3))
                 release.set()
-                self.assertEqual(first.result(), second.result())
+                self.assertEqual(first.result()['groups'], second.result()['groups'])
+                self.assertEqual(first.result()['settings'], {'goal': 'contest', 'difficulty': 0, 'mode': 'default'})
+                self.assertEqual(second.result()['settings'], {'goal': 'job', 'difficulty': 2, 'mode': 'default'})
         self.assertEqual(len(calls), 9)
+
+    def test_difficulty_and_default_goal_changes_reuse_analysis_with_current_settings(self):
+        api = FixtureApi()
+        service = Service(api)
+        first = service.analyze({'handle': 'solved_name'})
+        calls = list(api.calls)
+        second = service.analyze({'handle': 'solved_name', 'goal': 'job', 'difficulty': '2'})
+        self.assertEqual(api.calls, calls)
+        self.assertEqual(first['groups'], second['groups'])
+        self.assertEqual(second['settings'], {'goal': 'job', 'difficulty': 2, 'mode': 'default'})
+        self.assertEqual(first['settings']['difficulty'], 0)
+        self.assertTrue(service.weak_keys(api.user, 'job', 2, 'default'))
+
+    def test_retry_resumes_successful_pages_without_caching_a_partial_score(self):
+        class FailOnce(FixtureApi):
+            def __init__(self):
+                super().__init__()
+                self.probes = []
+                self.failed = False
+            def get(self, path, **params):
+                self.probes.append((path, params))
+                if path == '/problems' and params.get('q') == '@solved_name rated:true' and params.get('page') == 2 and not self.failed:
+                    self.failed = True
+                    raise ApiError(429, 'UPSTREAM_429', '모의 호출 제한', 1)
+                return super().get(path, **params)
+        api = FailOnce()
+        service = Service(api)
+        with self.assertRaises(ApiError):
+            service.analyze({'handle': 'solved_name'})
+        self.assertEqual(service.analysis_cache, {})
+        completed = list(api.calls)
+        result = service.analyze({'handle': 'solved_name'})
+        self.assertEqual(result['inner']['status'], 'ok')
+        for call in completed:
+            self.assertEqual(api.probes.count(call), 1)
+        self.assertEqual(sum(path == '/problems' and params.get('page') == 2 and params.get('q') == '@solved_name rated:true' for path, params in api.probes), 2)
+
+    def test_goal_switch_reuses_common_pages_and_waits_instead_of_repeating_rate_errors(self):
+        class BudgetFixture(FixtureApi):
+            def __init__(self):
+                super().__init__()
+                self.now, self.waited = 0, 0
+                self.budget = SolvedApi('mock', 'mock', clock=lambda: self.now, sleep=self.sleep)
+            def sleep(self, seconds):
+                self.now += seconds
+                self.waited += seconds
+            def get(self, path, **params):
+                self.budget._reserve(3 if path == '/problems' else 1)
+                return super().get(path, **params)
+        api = BudgetFixture()
+        service = Service(api)
+        for goal in ['contest', 'job', 'beginner']:
+            result = service.analyze({'handle': 'solved_name', 'goal': goal, 'mode': 'custom'})
+            self.assertEqual(len(result['groups']), 10)
+        self.assertGreater(api.waited, 0)
+        self.assertEqual(len(api.calls), len(set((path, tuple(params.items())) for path, params in api.calls)))
+        self.assertGreaterEqual(api.budget.tokens, 0)
+
+    def test_changed_profile_id_does_not_reuse_previous_accounts_pages(self):
+        api = FixtureApi()
+        service = Service(api)
+        first = service.analyze({'handle': 'solved_name'})
+        searches = sum(path == '/problems' for path, _ in api.calls)
+        api.user['id'] = 99
+        service.profiles.discard(lambda _: True)
+        result = service.analyze({'handle': 'solved_name'})
+        self.assertNotEqual(first['profileId'], result['profileId'])
+        self.assertEqual(sum(path == '/problems' for path, _ in api.calls), searches * 2)
+
+    def test_profile_cache_expires_and_accounts_are_separate(self):
+        api = FixtureApi()
+        service = Service(api)
+        now = [0]
+        service.profiles.clock = lambda: now[0]
+        service.profile('first')
+        service.profile('second')
+        service.profile('first')
+        self.assertEqual(len(api.calls), 2)
+        now[0] = 30
+        service.profile('first')
+        self.assertEqual(len(api.calls), 3)
+
+    def test_changed_total_discards_old_pages_before_retry(self):
+        api = FixtureApi()
+        service = Service(api)
+        original = api.get
+        failed = [False]
+        def changing(path, **params):
+            if path == '/problems' and params.get('page') == 2 and not failed[0]:
+                failed[0] = True
+                api.solved.pop()
+            return original(path, **params)
+        api.get = changing
+        with self.assertRaises(ApiError) as ctx:
+            service.top_sets('@solved_name rated:true', 200, 17)
+        self.assertEqual(ctx.exception.code, 'DATA_CHANGED')
+        self.assertFalse(service.pages.values)
+        self.assertEqual(len(service.top_sets('@solved_name rated:true', 200, 17)), 200)
+
+    def test_malformed_problem_does_not_poison_page_cache(self):
+        api = FixtureApi()
+        api.solved[0]['level'] = None
+        service = Service(api)
+        with self.assertRaises(ApiError):
+            service.top_sets('@solved_name rated:true', 200, 17)
+        self.assertFalse(service.pages.values)
 
     def test_more_than_four_pages_needed_when_subtasks_overlap(self):
         api = FixtureApi()
