@@ -10,6 +10,15 @@ from tests.fixtures import FixtureApi, problem
 
 
 class AnalysisTests(unittest.TestCase):
+    def test_completed_analysis_reuses_scoped_cache_without_repeating_searches(self):
+        api = FixtureApi()
+        service = Service(api)
+        first = service.analyze({'handle': 'solved_name'})
+        searches = sum(path == '/problems' for path, _ in api.calls)
+        second = service.analyze({'handle': 'solved_name'})
+        self.assertEqual(first, second)
+        self.assertEqual(sum(path == '/problems' for path, _ in api.calls), searches)
+
     def test_aliases_resolve_to_v4_keys(self):
         api = FixtureApi()
         tags = api.get('/tags')['tags']

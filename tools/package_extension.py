@@ -13,6 +13,7 @@ def package(output=None):
     for folder in ['popup', 'options', 'shared']:
         files.extend(p for p in (ROOT / folder).glob('*') if p.suffix in {'.html', '.js', '.css'})
     files.extend(ROOT / 'assets' / f'algoIcon{size}.png' for size in [16, 48, 128])
+    files.extend(ROOT / 'assets' / 'tiers' / f'{tier}.svg' for tier in range(32))
     with ZipFile(output, 'w', ZIP_DEFLATED) as archive:
         for file in sorted(files):
             archive.write(file, file.relative_to(ROOT).as_posix())

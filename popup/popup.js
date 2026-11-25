@@ -1,7 +1,8 @@
 import { api } from '../shared/api.js';
 import { readSettings, contextKey, accountSelection } from '../shared/storage.js';
-import { $, LatestRequest, showError, textElement, profileText } from '../shared/ui.js';
-import { calculateTierInfo, calculateRecommendTier } from '../utils.js';
+import { $, LatestRequest, showError } from '../shared/ui.js';
+import { renderProfileCard, problemLink } from '../shared/presentation.js';
+import { calculateRecommendTier } from '../utils.js';
 
 const searchRequest = new LatestRequest();
 const recommendationRequest = new LatestRequest();
@@ -42,15 +43,10 @@ async function search() {
 
 async function renderProfile(request) {
     const data = profile;
-    const settings = await readSettings(data.handle);
+    const [settings, raw] = await Promise.all([readSettings(data.handle), chrome.storage.local.get([`goal_${data.handle}`])]);
     if (!request.current() || data !== profile) return;
-    const tier = calculateTierInfo(data.tier);
     const range = calculateRecommendTier(data.tier, settings.goal, settings.difficulty);
-    $('result').replaceChildren(
-        textElement('p', profileText(data)),
-        textElement('p', `${tier.name} · 레이팅 ${data.rating} · 해결 ${data.solvedCount}문제`),
-        textElement('p', range ? `${{ beginner: '입문', job: '취업', contest: '대회' }[settings.goal]} · ${calculateTierInfo(range.lo).name} ~ ${calculateTierInfo(range.hi).name}` : '티어 비공개: 추천 범위를 계산할 수 없어.'),
-    );
+    renderProfileCard($('result'), data, settings, ['beginner', 'job', 'contest'].includes(raw[`goal_${data.handle}`]));
     $('recommend-section').style.display = range ? 'block' : 'none';
 }
 
@@ -60,7 +56,7 @@ async function recommend(weak) {
     const data = profile;
     const settings = await readSettings(data.handle);
     if (!request.current()) return;
-    $('problem-view').textContent = '안 푼 BOJ 문제 찾는 중...';
+    $('problem-view').textContent = '문제 찾는 중...';
     try {
         const result = await api.recommend(settings, weak, request);
         const latest = await readSettings();
@@ -73,12 +69,7 @@ async function recommend(weak) {
         }
         const problem = result.problem;
         if (result.profileId !== data.id || result.handle !== data.handle) throw new Error('조회 중 계정 정보가 바뀌었어. 프로필을 다시 조회해 줘.');
-        const link = textElement('a', `BOJ ${problem.bojProblemId} · ${problem.title}`, 'problem-link');
-        if (!/^https:\/\/(?:www\.)?acmicpc\.net\/problem\/\d+$/.test(problem.url)) throw new Error('BOJ 문제 링크가 올바르지 않아.');
-        link.href = problem.url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        $('problem-view').replaceChildren(link);
+        $('problem-view').replaceChildren(problemLink(problem));
     } catch (error) {
         if (request.current() && error.name !== 'AbortError') showError($('problem-view'), error);
     }
@@ -113,6 +104,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (raw.accountVersion === 4) await search();
         else $('result').textContent = '기존 ID는 BOJ 핸들일 수 있어. solved.ac 핸들을 확인하고 조회를 눌러 줘. 목표·난이도 설정은 보존돼.';
     } else if (!settings.handle) {
-        $('result').textContent = 'solved.ac 핸들을 입력해 줘. BOJ 핸들과 다를 수 있어.';
+        $('result').replaceChildren(document.createElement('span'));
+        $('result').children[0].textContent = '아이디를 입력하고';
+        $('result').append(document.createElement('br'), document.createElement('span'));
+        $('result').children[2].textContent = '티어를 확인해보세요!';
     }
+    $('solvedId').title = 'solved.ac 핸들을 입력해 주세요. BOJ 핸들과 다를 수 있습니다.';
+    $('solvedId').focus();
 });
