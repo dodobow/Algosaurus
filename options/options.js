@@ -1,5 +1,5 @@
 import { api } from '../shared/api.js';
-import { readSettings, normalizeSettings, saveSettings, contextKey } from '../shared/storage.js';
+import { readSettings, normalizeSettings, saveSettings, analysisContextKey } from '../shared/storage.js';
 import { $, LatestRequest, showError, profileText, textElement } from '../shared/ui.js';
 import { renderRange, tagCard, renderInner, GROUP_LABELS } from '../shared/presentation.js';
 import { calculateTierInfo, calculateRecommendTier } from '../utils.js';
@@ -10,6 +10,7 @@ let profile = null;
 let currentSettings;
 let selectedGoal = false;
 let analysisTimer;
+let analysisContext;
 
 const GOAL_MESSAGES = {
     beginner: '코딩 입문을 위해서는 간단한 브론즈, 실버 문제를 풀며 문법에 익숙해지는 과정이 중요해요!',
@@ -25,6 +26,7 @@ function spinner(target, text) {
 function resetAnalysis() {
     clearTimeout(analysisTimer);
     analysis.cancel();
+    analysisContext = undefined;
     $('analysis-result').style.display = 'none';
     $('inner-result').style.display = 'none';
     $('inner-start-box').style.display = 'none';
@@ -77,11 +79,12 @@ async function analyze() {
     if (!profile) return;
     const request = analysis.start();
     const settings = { ...currentSettings };
+    analysisContext = analysisContextKey(settings);
     const account = profile;
     try {
         const result = await api.analyze(settings, request);
         const latest = await readSettings();
-        if (!request.current() || profile !== account || contextKey(settings) !== contextKey(latest)) return;
+        if (!request.current() || profile !== account || analysisContextKey(settings) !== analysisContextKey(latest)) return;
         if (result.profileId !== account.id || result.handle !== settings.handle) throw new Error('계정 정보가 변경되었습니다. 프로필을 다시 조회해주세요.');
         renderAnalysis(result);
     } catch (error) {
@@ -93,15 +96,19 @@ async function analyze() {
 }
 
 async function reload() {
-    resetAnalysis();
     const request = loading.start();
     const raw = await chrome.storage.local.get(null);
     if (!request.current()) return;
     currentSettings = normalizeSettings(raw);
+    const context = analysisContextKey(currentSettings);
+    if (analysisContext !== context) {
+        resetAnalysis();
+    }
     selectedGoal = ['beginner', 'job', 'contest'].includes(raw[`goal_${currentSettings.handle}`]);
     if (profile?.handle !== currentSettings.handle) profile = null;
     renderSettings();
     if (!currentSettings.handle || raw.accountVersion !== 4) {
+        resetAnalysis();
         $('dashboard-title').textContent = '팝업에서 solved.ac 계정을 먼저 연동해주세요.';
         $('loading-spinner').textContent = 'solved.ac 핸들은 BOJ 핸들과 다를 수 있습니다.';
         $('inner-loading').style.display = 'none';
@@ -116,7 +123,10 @@ async function reload() {
         $('dashboard-title').replaceChildren(textElement('span', '✈️ '), handle, textElement('span', ' 님의 목표는 무엇인가요?'));
         $('dashboard-title').title = profileText(data);
         renderSettings();
-        analysisTimer = setTimeout(analyze, 300);
+        if (analysisContext !== context) {
+            analysisContext = context;
+            analysisTimer = setTimeout(analyze, 300);
+        }
     } catch (error) {
         if (request.current() && error.name !== 'AbortError') {
             showError($('dashboard-title'), error);
@@ -137,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (currentSettings?.handle) await saveSettings(currentSettings.handle, { mode: currentSettings.mode === 'custom' ? 'default' : 'custom' });
     });
     chrome.storage.onChanged.addListener((changes, area) => {
-        if (area === 'local' && (changes.solvedId || Object.keys(changes).some(key => ['goal_', 'diff_', 'mode_'].some(prefix => key === prefix + currentSettings?.handle)))) return reload();
+        if (area === 'local' && (changes.solvedId || changes.accountVersion || Object.keys(changes).some(key => ['goal_', 'diff_', 'mode_'].some(prefix => key === prefix + currentSettings?.handle)))) return reload();
     });
     $('refresh-inner-btn').addEventListener('click', () => { resetAnalysis(); return analyze(); });
     await reload();

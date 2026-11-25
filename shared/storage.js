@@ -13,6 +13,10 @@ export function contextKey(settings) {
     return JSON.stringify([settings.handle, settings.goal, settings.difficulty, settings.mode]);
 }
 
+export function analysisContextKey(settings) {
+    return JSON.stringify([settings.handle, settings.mode, settings.mode === 'custom' ? settings.goal : null]);
+}
+
 export function accountSelection(profile, raw) {
     const values = { solvedId: profile.handle, accountVersion: 4 };
     const old = raw.solvedId;
