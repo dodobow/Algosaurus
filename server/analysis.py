@@ -3,35 +3,35 @@ from .api import ApiError
 
 GROUPS = {
     'default': [
-        ('다이나믹 프로그래밍', ['dp']), ('구현', ['implementation']),
-        ('그래프', ['graphs']), ('그리디', ['greedy']), ('자료 구조', ['data_structures']),
-        ('문자열', ['string']), ('수학', ['math']), ('기하학', ['geometry']),
+        ('다이나믹 프로그래밍', ['dp']), ('구현', ['impl']),
+        ('그래프', ['graph']), ('그리디', ['greedy']), ('자료 구조', ['ds']),
+        ('문자열', ['string']), ('수학', ['math']), ('기하학', ['geom']),
     ],
     'beginner': [
-        ('구현', ['implementation', 'simulation']), ('완전 탐색', ['bruteforcing']),
+        ('구현', ['impl', 'sim']), ('완전 탐색', ['brute']),
         ('이분 탐색', ['binary_search']), ('수학', ['math', 'arithmetic']),
         ('선형 자료 구조', ['stack', 'queue', 'deque']), ('문자열', ['string']),
-        ('정렬', ['sorting']), ('애드 혹', ['ad_hoc']),
+        ('정렬', ['sort']), ('애드 혹', ['adhoc']),
         ('재귀와 집합', ['recursion', 'set']), ('기초 알고리즘', ['dp', 'greedy']),
     ],
     'job': [
-        ('DP', ['dp', 'knapsack', 'dp_tree']), ('그리디', ['greedy']),
-        ('그래프와 최단 거리', ['graphs', 'shortest_path', 'bfs', 'dfs']),
-        ('자료 구조', ['priority_queue', 'disjoint_set', 'stack', 'queue', 'set', 'deque']),
-        ('이분 탐색', ['binary_search', 'parametric_search']), ('완전 탐색', ['backtracking', 'bruteforcing']),
-        ('구현', ['simulation', 'implementation', 'case_work']), ('문자열', ['string']),
-        ('누적 합', ['prefix_sum']), ('다양한 테크닉', ['two_pointer', 'sliding_window', 'sweeping']),
+        ('DP', ['dp', 'knapsack', 'tree_dp']), ('그리디', ['greedy']),
+        ('그래프와 최단 거리', ['graph', 'shortest_path', 'bfs', 'dfs']),
+        ('자료 구조', ['pq', 'dsu', 'stack', 'queue', 'set', 'deque']),
+        ('이분 탐색', ['binary_search', 'parametric_search']), ('완전 탐색', ['backtrack', 'brute']),
+        ('구현', ['sim', 'impl', 'casework']), ('문자열', ['string']),
+        ('누적 합', ['prefix_sum']), ('다양한 테크닉', ['two_pointer', 'window', 'sweep']),
     ],
     'contest': [
-        ('세그먼트 트리', ['segtree', 'lazyprop', 'pst', 'merge_sort_tree']),
+        ('세그먼트 트리', ['segtree', 'lazyprop', 'pst', 'mergesort_tree']),
         ('문자열', ['string', 'kmp', 'trie', 'suffix_array']),
-        ('정수론과 확률', ['number_theory', 'probability', 'combinatorics']),
-        ('애드 혹', ['ad_hoc']), ('그리디', ['greedy']),
-        ('DP', ['dp', 'dp_tree', 'dp_digit', 'dp_bitfield', 'tsp', 'cht']),
-        ('그래프와 트리', ['graphs', 'trees', 'flow', 'mcmf', 'mfmc', 'scc', '2_sat', 'bipartite_matching', 'lca', 'centroid']),
-        ('기하학', ['geometry', 'convex_hull', 'line_intersection', 'rotating_calipers', 'polygon_area']),
-        ('쿼리와 최적화', ['mo', 'offline_queries', 'sqrt_decomposition', 'smaller_to_larger', 'coordinate_compression']),
-        ('다양한 테크닉', ['bitmask', 'mitm', 'sweeping', 'permutation_cycle_decomposition', 'game_theory', 'sprague_grundy', 'euler_tour_technique']),
+        ('정수론과 확률', ['number_theory', 'prob', 'combinatorics']),
+        ('애드 혹', ['adhoc']), ('그리디', ['greedy']),
+        ('DP', ['dp', 'tree_dp', 'digit_dp', 'bit_dp', 'tsp', 'cht']),
+        ('그래프와 트리', ['graph', 'tree', 'flow', 'mcmf', 's_t_mincut', 'scc', '2sat', 'bipartite_matching', 'lca', 'centroid']),
+        ('기하학', ['geom', 'hull', 'line_intersect', 'calipers', 'poly_area']),
+        ('쿼리와 최적화', ['mo', 'offline', 'sqrt_decomp', 'small_to_large', 'value_compress']),
+        ('다양한 테크닉', ['bitmask', 'mitm', 'sweep', 'cycle_decomp', 'game', 'sprague_grundy', 'ett']),
     ],
 }
 
@@ -42,8 +42,10 @@ def canonical_groups(catalog, mode, goal):
         key = tag.get('key')
         if not isinstance(key, str) or not key or not all(c.isascii() and (c.isalnum() or c in '_-') for c in key):
             raise ApiError(502, 'INVALID_TAGS', '태그 키 형식이 올바르지 않아.')
-        for alias in [key, *tag.get('aliases', [])]:
-            aliases[alias] = key
+        aliases[key] = key
+    for tag in catalog:
+        for alias in tag.get('aliases', []):
+            aliases.setdefault(alias, tag['key'])
     groups = []
     for name, keys in GROUPS[goal if mode == 'custom' else 'default']:
         if any(key not in aliases for key in keys):

@@ -1,8 +1,9 @@
 from copy import deepcopy
 
 from server.api import ApiError
-from server.analysis import GROUPS
 import re
+import json
+from pathlib import Path
 
 
 PROFILE = {
@@ -55,8 +56,5 @@ class FixtureApi:
         if path.startswith('/problems/'):
             return deepcopy(self.problems[0])
         if path == '/tags':
-            mapping = {'implementation': 'impl', 'sorting': 'sort', 'graphs': 'graph'}
-            keys = set(key for groups in GROUPS.values() for _, names in groups for key in names)
-            return {'tags': [{'key': mapping.get(key, key), 'aliases': [key] if key in mapping else [],
-                              'names': {'ko': key}, 'parents': [], 'rated': True} for key in sorted(keys)]}
+            return json.loads((Path(__file__).parent / 'data' / 'tags-v4.json').read_text(encoding='utf-8'))
         raise AssertionError((path, params))

@@ -15,7 +15,7 @@ solved.ac 공식 API v4를 사용하는 Vanilla JavaScript Chrome 확장이야. 
 
 ```powershell
 cd C:\Projects\Algosaurus
-Copy-Item .env.example .env
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 ```
 
 `.env`를 열어 `SOLVED_CLIENT_ID`와 `SOLVED_CLIENT_SECRET`을 입력한 뒤 실행해. 비밀값을 Git이나 확장 코드에 넣지 마. 기존 환경변수가 있으면 `.env`보다 우선해.
@@ -35,7 +35,7 @@ python -m server.app
 
 추천은 설정 난이도, 한국어 문제문, BOJ 제출 가능 조건을 적용하고 조회한 solved.ac 사용자의 풀이를 제외해. 실제 링크는 문제 상세의 `ojLinks`에서 받아. solved.ac 문제 번호로 BOJ URL을 만들지 않아.
 
-2026-11-20 검증 시 BOJ 문제 URL은 서비스 재개 일정 연기 공지를 표시했어. 링크 이동은 확인했지만, BOJ의 문제 본문·제출 서비스 이용 여부는 실제 재개 상태에 따라 달라져.
+2026-11-25에 `dodobow`의 실제 프로필·목표 추천·약점 추천·기본/취업 맞춤 분석을 확인했고, 팝업에서 추천한 BOJ 18223번의 문제 본문까지 열었어. Chrome 저장소 대역을 사용한 화면 검증이며, 실제 확장 설치·코드 제출 검증과는 구분해.
 
 ## 설정값
 
@@ -81,6 +81,8 @@ python tools/check.py
 python -m tests.dev_server
 # http://127.0.0.1:8765/popup/popup.html
 ```
+
+실제 API로 화면을 확인하려면 `.env`를 준비한 뒤 `python -m tests.dev_server --live`로 실행해. 이 모드도 Chrome 저장소는 테스트용 localStorage로 대체하므로 실제 확장 설치 검증은 아니야. 모의 서버와 실제 서버는 모두 같은 8765 포트를 사용하니 하나씩 실행해.
 
 인증정보가 설정된 실제 서버를 실행한 뒤에는 다음으로 프로필·추천을 확인할 수 있어.
 

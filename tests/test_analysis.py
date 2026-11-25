@@ -12,9 +12,17 @@ from tests.fixtures import FixtureApi, problem
 class AnalysisTests(unittest.TestCase):
     def test_aliases_resolve_to_v4_keys(self):
         api = FixtureApi()
-        groups = canonical_groups(api.get('/tags')['tags'], 'default', 'contest')
+        tags = api.get('/tags')['tags']
+        self.assertNotIn('implementation', next(tag for tag in tags if tag['key'] == 'impl')['aliases'])
+        groups = canonical_groups(tags, 'default', 'contest')
         self.assertEqual(groups[1]['keys'], ['impl'])
         self.assertEqual(groups[2]['keys'], ['graph'])
+
+    def test_canonical_key_wins_over_another_tags_alias(self):
+        tags = FixtureApi().get('/tags')['tags']
+        groups = canonical_groups(tags, 'custom', 'contest')
+        self.assertIn('combinatorics', groups[2]['keys'])
+        self.assertNotIn('stat', groups[2]['keys'])
 
     def test_query_chunks_respect_100_chars_and_8_terms(self):
         keys = ['long_tag_name_' + str(i) for i in range(12)]

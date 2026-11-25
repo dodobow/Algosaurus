@@ -1,0 +1,1255 @@
+{
+  "source": "https://solved.ac/api/v4/tags",
+  "capturedAt": "2026-11-25",
+  "tags": [
+    {
+      "id": 96,
+      "key": "2sat",
+      "isMeta": false,
+      "parents": [
+        "graph",
+        "scc"
+      ],
+      "names": {
+        "ko": "2-SAT",
+        "en": "2-sat",
+        "ja": "2-SAT"
+      },
+      "aliases": [
+        "투 셋",
+        "two-sat"
+      ],
+      "rated": false
+    },
+    {
+      "id": 12,
+      "key": "adhoc",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "애드 혹",
+        "en": "ad-hoc",
+        "ja": "アドホック"
+      },
+      "aliases": [],
+      "rated": true
+    },
+    {
+      "id": 14,
+      "key": "arithmetic",
+      "isMeta": false,
+      "parents": [
+        "math"
+      ],
+      "names": {
+        "ko": "사칙연산",
+        "en": "arithmetic",
+        "ja": "算数"
+      },
+      "aliases": [
+        "산수",
+        "四則演算"
+      ],
+      "rated": false
+    },
+    {
+      "id": 43,
+      "key": "backtrack",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "백트래킹",
+        "en": "backtracking",
+        "ja": "バックトラック法"
+      },
+      "aliases": [
+        "퇴각 검색",
+        "branch and bound",
+        "後戻り探索"
+      ],
+      "rated": true
+    },
+    {
+      "id": 15,
+      "key": "bfs",
+      "isMeta": false,
+      "parents": [
+        "graph_traversal"
+      ],
+      "names": {
+        "ko": "너비 우선 탐색",
+        "en": "breadth-first search",
+        "ja": "幅優先検索"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 34,
+      "key": "binary_search",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "이분 탐색",
+        "en": "binary search",
+        "ja": "二分探索"
+      },
+      "aliases": [
+        "이진 탐색"
+      ],
+      "rated": false
+    },
+    {
+      "id": 99,
+      "key": "bipartite_matching",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "이분 매칭",
+        "en": "bipartite matching",
+        "ja": "2部マッチング"
+      },
+      "aliases": [
+        "二部マッチング",
+        "バイパータイトマッチング"
+      ],
+      "rated": false
+    },
+    {
+      "id": 29,
+      "key": "bitmask",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "비트마스킹",
+        "en": "bitmasks",
+        "ja": "ビット表現"
+      },
+      "aliases": [
+        "비트마스크",
+        "비트필드",
+        "bitwise operations",
+        "bit flags",
+        "ビットマスク"
+      ],
+      "rated": false
+    },
+    {
+      "id": 217,
+      "key": "bit_dp",
+      "isMeta": false,
+      "parents": [
+        "dp",
+        "bitmask"
+      ],
+      "names": {
+        "ko": "비트필드를 이용한 DP",
+        "en": "dp using bitfield",
+        "ja": "ビットを使用したDP"
+      },
+      "aliases": [
+        "비트마스크"
+      ],
+      "rated": false
+    },
+    {
+      "id": 13,
+      "key": "brute",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "브루트포싱",
+        "en": "bruteforcing",
+        "ja": "全探索"
+      },
+      "aliases": [
+        "완전탐색",
+        "브루트포스",
+        "exhaustive search",
+        "bruteforce",
+        "ブルートフォース",
+        "完全探索",
+        "力ずく探索"
+      ],
+      "rated": true
+    },
+    {
+      "id": 208,
+      "key": "calipers",
+      "isMeta": false,
+      "parents": [
+        "geom"
+      ],
+      "names": {
+        "ko": "회전하는 캘리퍼스",
+        "en": "rotating calipers",
+        "ja": "回転するキャリパス"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 22,
+      "key": "casework",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "많은 조건 분기",
+        "en": "case work",
+        "ja": "ケースワーク"
+      },
+      "aliases": [
+        "케이스",
+        "케이스워크",
+        "ケース分析",
+        "事例分析"
+      ],
+      "rated": true
+    },
+    {
+      "id": 89,
+      "key": "centroid",
+      "isMeta": false,
+      "parents": [
+        "tree"
+      ],
+      "names": {
+        "ko": "센트로이드",
+        "en": "centroid of a tree",
+        "ja": "木の重心"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 213,
+      "key": "cht",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "볼록 껍질을 이용한 최적화",
+        "en": "convex hull trick",
+        "ja": "凸包トリック"
+      },
+      "aliases": [
+        "컨벡스 헐 최적화",
+        "컨벡스 헐 트릭"
+      ],
+      "rated": false
+    },
+    {
+      "id": 71,
+      "key": "combinatorics",
+      "isMeta": false,
+      "parents": [
+        "math"
+      ],
+      "names": {
+        "ko": "조합론",
+        "en": "combinatorics",
+        "ja": "組み合わせ"
+      },
+      "aliases": [
+        "순열",
+        "확률",
+        "counting",
+        "permutations",
+        "組合せ",
+        "コンビナトリクス"
+      ],
+      "rated": false
+    },
+    {
+      "id": 223,
+      "key": "cycle_decomp",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "순열 사이클 분할",
+        "en": "permutation cycle decomposition",
+        "ja": "順列サイクル分解"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 164,
+      "key": "deque",
+      "isMeta": false,
+      "parents": [
+        "ds"
+      ],
+      "names": {
+        "ko": "덱",
+        "en": "deques",
+        "ja": "両端キュー"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 16,
+      "key": "dfs",
+      "isMeta": false,
+      "parents": [
+        "graph_traversal"
+      ],
+      "names": {
+        "ko": "깊이 우선 탐색",
+        "en": "depth-first search",
+        "ja": "深さ優先探索"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 107,
+      "key": "digit_dp",
+      "isMeta": false,
+      "parents": [
+        "dp"
+      ],
+      "names": {
+        "ko": "자릿수 DP",
+        "en": "digit dp",
+        "ja": "桁DP"
+      },
+      "aliases": [
+        "자릿수를 이용한 다이나믹 프로그래밍",
+        "桁動的計画法"
+      ],
+      "rated": false
+    },
+    {
+      "id": 2,
+      "key": "dp",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "다이나믹 프로그래밍",
+        "en": "dynamic programming",
+        "ja": "動的計画法"
+      },
+      "aliases": [
+        "동적 계획법",
+        "메모이제이션",
+        "memoization",
+        "動的プログラミング",
+        "ダイナミックプログラミング",
+        "メモ化"
+      ],
+      "rated": true
+    },
+    {
+      "id": 5,
+      "key": "ds",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "자료 구조",
+        "en": "data structures",
+        "ja": "データ構造"
+      },
+      "aliases": [
+        "자구"
+      ],
+      "rated": true
+    },
+    {
+      "id": 75,
+      "key": "dsu",
+      "isMeta": false,
+      "parents": [
+        "ds"
+      ],
+      "names": {
+        "ko": "분리 집합",
+        "en": "disjoint sets",
+        "ja": "素集合データ構造"
+      },
+      "aliases": [
+        "유니온 파인드",
+        "서로소 집합",
+        "union-find",
+        "素集合",
+        "ユニオンファインド"
+      ],
+      "rated": false
+    },
+    {
+      "id": 91,
+      "key": "ett",
+      "isMeta": false,
+      "parents": [
+        "tree"
+      ],
+      "names": {
+        "ko": "오일러 경로 테크닉",
+        "en": "euler tour technique",
+        "ja": "オイラーツアー"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 119,
+      "key": "flow",
+      "isMeta": false,
+      "parents": [
+        "graph"
+      ],
+      "names": {
+        "ko": "유량",
+        "en": "flows",
+        "ja": "フロー"
+      },
+      "aliases": [
+        "디닉",
+        "포드 풀커슨",
+        "플로우",
+        "network flow",
+        "min cut",
+        "ford fulkerson",
+        "最大フロー",
+        "ネットワークフロー",
+        "流量"
+      ],
+      "rated": true
+    },
+    {
+      "id": 61,
+      "key": "game",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "게임 이론",
+        "en": "games",
+        "ja": "ゲーム理論"
+      },
+      "aliases": [
+        "님",
+        "nim"
+      ],
+      "rated": true
+    },
+    {
+      "id": 8,
+      "key": "geom",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "기하학",
+        "en": "geometry",
+        "ja": "幾何学"
+      },
+      "aliases": [
+        "기하",
+        "도형",
+        "幾何",
+        "図形"
+      ],
+      "rated": true
+    },
+    {
+      "id": 3,
+      "key": "graph",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "그래프",
+        "en": "graphs",
+        "ja": "グラフ"
+      },
+      "aliases": [],
+      "rated": true
+    },
+    {
+      "id": 6,
+      "key": "greedy",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "그리디",
+        "en": "greedy",
+        "ja": "貪欲法"
+      },
+      "aliases": [
+        "욕심쟁이 알고리즘",
+        "탐욕법",
+        "グリーディ"
+      ],
+      "rated": true
+    },
+    {
+      "id": 62,
+      "key": "hull",
+      "isMeta": false,
+      "parents": [
+        "geom"
+      ],
+      "names": {
+        "ko": "볼록 껍질",
+        "en": "convex hull",
+        "ja": "凸包"
+      },
+      "aliases": [
+        "컨벡스 헐",
+        "コンベックスハル"
+      ],
+      "rated": false
+    },
+    {
+      "id": 7,
+      "key": "impl",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "구현",
+        "en": "implementation",
+        "ja": "実装"
+      },
+      "aliases": [],
+      "rated": true
+    },
+    {
+      "id": 131,
+      "key": "kmp",
+      "isMeta": false,
+      "parents": [
+        "string"
+      ],
+      "names": {
+        "ko": "KMP",
+        "en": "KMP",
+        "ja": "KMP"
+      },
+      "aliases": [
+        "knuth–morris–pratt",
+        "クヌース–モリス–プラット法",
+        "クヌース・モリス・プラット法"
+      ],
+      "rated": false
+    },
+    {
+      "id": 32,
+      "key": "knapsack",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "배낭 문제",
+        "en": "knapsack",
+        "ja": "ナップサック問題"
+      },
+      "aliases": [
+        "냅색"
+      ],
+      "rated": false
+    },
+    {
+      "id": 197,
+      "key": "lazyprop",
+      "isMeta": false,
+      "parents": [
+        "segtree"
+      ],
+      "names": {
+        "ko": "느리게 갱신되는 세그먼트 트리",
+        "en": "lazy propagation",
+        "ja": "遅延評価セグメント木"
+      },
+      "aliases": [
+        "구간 트리",
+        "레이지",
+        "레이지 프로파게이션",
+        "레이지 프로퍼게이션",
+        "펜윅"
+      ],
+      "rated": false
+    },
+    {
+      "id": 195,
+      "key": "lca",
+      "isMeta": false,
+      "parents": [
+        "tree"
+      ],
+      "names": {
+        "ko": "최소 공통 조상",
+        "en": "lowest common ancestor",
+        "ja": "最下位共通祖先"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 196,
+      "key": "line_intersect",
+      "isMeta": false,
+      "parents": [
+        "geom"
+      ],
+      "names": {
+        "ko": "선분 교차 판정",
+        "en": "line segment intersection check",
+        "ja": "直線の交点"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 1,
+      "key": "math",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "수학",
+        "en": "mathematics",
+        "ja": "数学"
+      },
+      "aliases": [],
+      "rated": true
+    },
+    {
+      "id": 185,
+      "key": "mcmf",
+      "isMeta": false,
+      "parents": [
+        "flow"
+      ],
+      "names": {
+        "ko": "최소 비용 최대 유량",
+        "en": "minimum cost maximum flow",
+        "ja": "最小費用最大流問題"
+      },
+      "aliases": [
+        "디니츠",
+        "디닉",
+        "포드 풀커슨",
+        "dinic",
+        "dinitz",
+        "ford fulkerson"
+      ],
+      "rated": false
+    },
+    {
+      "id": 57,
+      "key": "mergesort_tree",
+      "isMeta": false,
+      "parents": [
+        "sort",
+        "segtree"
+      ],
+      "names": {
+        "ko": "머지 소트 트리",
+        "ja": "マージソート木",
+        "en": "merge sort trees"
+      },
+      "aliases": [
+        "병합 정렬 트리",
+        "합병 정렬 트리",
+        "マージ木"
+      ],
+      "rated": false
+    },
+    {
+      "id": 148,
+      "key": "mitm",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "중간에서 만나기",
+        "en": "meet in the middle",
+        "ja": "半分全列挙"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 191,
+      "key": "mo",
+      "isMeta": false,
+      "parents": [
+        "offline"
+      ],
+      "names": {
+        "ko": "Mo's",
+        "en": "mo's",
+        "ja": "Mo's"
+      },
+      "aliases": [
+        "sqrt decomposition",
+        "square root decomposition",
+        "평방 분할법",
+        "모",
+        "モス",
+        "平方分割",
+        "モー"
+      ],
+      "rated": false
+    },
+    {
+      "id": 27,
+      "key": "number_theory",
+      "isMeta": false,
+      "parents": [
+        "math"
+      ],
+      "names": {
+        "ko": "정수론",
+        "en": "number theory",
+        "ja": "整数論"
+      },
+      "aliases": [],
+      "rated": true
+    },
+    {
+      "id": 47,
+      "key": "offline",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "오프라인 쿼리",
+        "en": "offline queries",
+        "ja": "オフラインクエリ"
+      },
+      "aliases": [
+        "배치 쿼리",
+        "batch queries",
+        "offline query",
+        "batch query",
+        "バッチクエリ"
+      ],
+      "rated": false
+    },
+    {
+      "id": 59,
+      "key": "parametric_search",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "매개 변수 탐색",
+        "en": "parametric search",
+        "ja": "パラメトリック探索"
+      },
+      "aliases": [
+        "파라메트릭",
+        "パラメトリックサーチ",
+        "パラメータ探索",
+        "パラメータサーチ"
+      ],
+      "rated": false
+    },
+    {
+      "id": 66,
+      "key": "poly_area",
+      "isMeta": false,
+      "parents": [
+        "geom"
+      ],
+      "names": {
+        "ko": "다각형의 넓이",
+        "en": "area of a polygon",
+        "ja": "多角形の面積"
+      },
+      "aliases": [
+        "넓이"
+      ],
+      "rated": false
+    },
+    {
+      "id": 160,
+      "key": "pq",
+      "isMeta": false,
+      "parents": [
+        "ds"
+      ],
+      "names": {
+        "ko": "우선순위 큐",
+        "en": "priority queues",
+        "ja": "優先度付きキュー"
+      },
+      "aliases": [
+        "힙",
+        "heaps"
+      ],
+      "rated": false
+    },
+    {
+      "id": 39,
+      "key": "prefix_sum",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "누적 합",
+        "en": "prefix sum",
+        "ja": "累積和"
+      },
+      "aliases": [
+        "구간 합",
+        "부분 합",
+        "prefix array",
+        "running sum",
+        "partial sum",
+        "プレフィックス和",
+        "部分和",
+        "前置和"
+      ],
+      "rated": false
+    },
+    {
+      "id": 50,
+      "key": "prob",
+      "isMeta": false,
+      "parents": [
+        "math"
+      ],
+      "names": {
+        "ko": "확률론",
+        "en": "probability theory",
+        "ja": "確率論"
+      },
+      "aliases": [
+        "기대값",
+        "기댓값",
+        "expected value",
+        "期待値"
+      ],
+      "rated": false
+    },
+    {
+      "id": 190,
+      "key": "pst",
+      "isMeta": false,
+      "parents": [
+        "segtree"
+      ],
+      "names": {
+        "ko": "퍼시스턴트 세그먼트 트리",
+        "en": "persistent segment tree",
+        "ja": "永続セグメント木"
+      },
+      "aliases": [
+        "구간트리",
+        "퍼시스턴트 구간트리",
+        "퍼시스턴트 세그트리"
+      ],
+      "rated": false
+    },
+    {
+      "id": 18,
+      "key": "queue",
+      "isMeta": false,
+      "parents": [
+        "ds"
+      ],
+      "names": {
+        "ko": "큐",
+        "ja": "キュー",
+        "en": "queues"
+      },
+      "aliases": [
+        "queue"
+      ],
+      "rated": false
+    },
+    {
+      "id": 161,
+      "key": "recursion",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "재귀",
+        "en": "recursion",
+        "ja": "再帰"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 97,
+      "key": "scc",
+      "isMeta": false,
+      "parents": [
+        "graph"
+      ],
+      "names": {
+        "ko": "강한 연결 요소",
+        "en": "strongly connected component",
+        "ja": "強連結"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 45,
+      "key": "segtree",
+      "isMeta": false,
+      "parents": [
+        "ds"
+      ],
+      "names": {
+        "ko": "세그먼트 트리",
+        "en": "segment trees",
+        "ja": "セグメント木"
+      },
+      "aliases": [
+        "구간 트리",
+        "세그트리",
+        "펜윅",
+        "range tree",
+        "interval tree",
+        "rmq",
+        "range query",
+        "セグ木",
+        "セグメントツリー"
+      ],
+      "rated": true
+    },
+    {
+      "id": 149,
+      "key": "set",
+      "isMeta": false,
+      "parents": [
+        "ds"
+      ],
+      "names": {
+        "ko": "집합과 맵",
+        "en": "sets and maps",
+        "ja": "集合とマップ"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 10,
+      "key": "shortest_path",
+      "isMeta": false,
+      "parents": [
+        "graph_traversal"
+      ],
+      "names": {
+        "ko": "최단 경로",
+        "en": "shortest paths",
+        "ja": "最短経路"
+      },
+      "aliases": [
+        "최단 거리",
+        "最短パス",
+        "最短距離"
+      ],
+      "rated": false
+    },
+    {
+      "id": 28,
+      "key": "sim",
+      "isMeta": false,
+      "parents": [
+        "impl"
+      ],
+      "names": {
+        "ko": "시뮬레이션",
+        "ja": "シミュレーション",
+        "en": "simulations"
+      },
+      "aliases": [
+        "simulating"
+      ],
+      "rated": true
+    },
+    {
+      "id": 132,
+      "key": "small_to_large",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "작은 집합에서 큰 집합으로 합치는 테크닉",
+        "en": "smaller to larger technique",
+        "ja": "小さい方から大きい方へのテクニック"
+      },
+      "aliases": [
+        "스몰 투 라지",
+        "sack",
+        "small to large",
+        "merge heuristics"
+      ],
+      "rated": false
+    },
+    {
+      "id": 41,
+      "key": "sort",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "정렬",
+        "en": "sorting",
+        "ja": "ソート"
+      },
+      "aliases": [
+        "소팅",
+        "reordering",
+        "整列",
+        "ソーティング",
+        "並び替え"
+      ],
+      "rated": false
+    },
+    {
+      "id": 214,
+      "key": "sprague_grundy",
+      "isMeta": false,
+      "parents": [
+        "game"
+      ],
+      "names": {
+        "ko": "스프라그–그런디 정리",
+        "en": "sprague–grundy theorem",
+        "ja": "スプラグ・グランディの定理"
+      },
+      "aliases": [
+        "님버",
+        "nimber"
+      ],
+      "rated": false
+    },
+    {
+      "id": 46,
+      "key": "sqrt_decomp",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "제곱근 분할법",
+        "en": "square root decomposition",
+        "ja": "平方分割"
+      },
+      "aliases": [
+        "루트 분할법",
+        "모",
+        "평방 분할법",
+        "버킷",
+        "mo's",
+        "bucket decomposition",
+        "sqrt分割",
+        "ルート分割"
+      ],
+      "rated": false
+    },
+    {
+      "id": 17,
+      "key": "stack",
+      "isMeta": false,
+      "parents": [
+        "ds"
+      ],
+      "names": {
+        "ko": "스택",
+        "en": "stacks",
+        "ja": "スタック"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 51,
+      "key": "stat",
+      "isMeta": false,
+      "parents": [
+        "math"
+      ],
+      "names": {
+        "ko": "통계학",
+        "en": "statistics",
+        "ja": "統計学"
+      },
+      "aliases": [
+        "분산",
+        "평균",
+        "표준 편차",
+        "분포",
+        "combinatorics",
+        "counting",
+        "distribution"
+      ],
+      "rated": false
+    },
+    {
+      "id": 4,
+      "key": "string",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "문자열",
+        "en": "strings",
+        "ja": "文字列"
+      },
+      "aliases": [
+        "스트링",
+        "문자",
+        "ストリング"
+      ],
+      "rated": true
+    },
+    {
+      "id": 142,
+      "key": "suffix_array",
+      "isMeta": false,
+      "parents": [
+        "string"
+      ],
+      "names": {
+        "ko": "접미사 배열과 LCP 배열",
+        "en": "suffix and lcp array",
+        "ja": "接尾辞配列・LCP配列"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 42,
+      "key": "sweep",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "스위핑",
+        "en": "sweeping",
+        "ja": "平面走査"
+      },
+      "aliases": [
+        "スイープライン",
+        "走査線",
+        "平面スイープ"
+      ],
+      "rated": false
+    },
+    {
+      "id": 120,
+      "key": "s_t_mincut",
+      "isMeta": false,
+      "parents": [
+        "flow"
+      ],
+      "names": {
+        "ko": "최대 유량 최소 컷 정리",
+        "en": "s-t minimum cut",
+        "ja": "s-t 最小カット"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 11,
+      "key": "tree",
+      "isMeta": false,
+      "parents": [
+        "graph"
+      ],
+      "names": {
+        "ko": "트리",
+        "en": "trees",
+        "ja": "木"
+      },
+      "aliases": [
+        "ツリー"
+      ],
+      "rated": true
+    },
+    {
+      "id": 109,
+      "key": "tree_dp",
+      "isMeta": false,
+      "parents": [
+        "dp",
+        "tree"
+      ],
+      "names": {
+        "ko": "트리DP",
+        "en": "dp on trees",
+        "ja": "木DP"
+      },
+      "aliases": [
+        "트리에서의 다이나믹 프로그래밍",
+        "木上の動的計画法"
+      ],
+      "rated": false
+    },
+    {
+      "id": 55,
+      "key": "trie",
+      "isMeta": false,
+      "parents": [
+        "ds",
+        "tree"
+      ],
+      "names": {
+        "ko": "트라이",
+        "en": "trie",
+        "ja": "トライ木"
+      },
+      "aliases": [
+        "접두사 트리"
+      ],
+      "rated": false
+    },
+    {
+      "id": 49,
+      "key": "tsp",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "외판원 순회 문제",
+        "en": "travelling salesman problem",
+        "ja": "巡回セールスマン問題"
+      },
+      "aliases": [
+        "여행하는 외판원 문제",
+        "旅行セールスマン問題",
+        "セールスマン巡回問題"
+      ],
+      "rated": false
+    },
+    {
+      "id": 73,
+      "key": "two_pointer",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "두 포인터",
+        "en": "two-pointer",
+        "ja": "尺取り法"
+      },
+      "aliases": [
+        "인치웜",
+        "투 포인터",
+        "inchworm",
+        "二ポインタ",
+        "ツーポインタ法"
+      ],
+      "rated": false
+    },
+    {
+      "id": 222,
+      "key": "value_compress",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "값 및 좌표 압축",
+        "en": "value or coordinate compression",
+        "ja": "値と座標の圧縮"
+      },
+      "aliases": [],
+      "rated": false
+    },
+    {
+      "id": 74,
+      "key": "window",
+      "isMeta": false,
+      "parents": [],
+      "names": {
+        "ko": "슬라이딩 윈도우",
+        "ja": "スライディングウィンドウ",
+        "en": "sliding windows"
+      },
+      "aliases": [],
+      "rated": false
+    }
+  ]
+}
