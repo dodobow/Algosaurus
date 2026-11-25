@@ -50,7 +50,7 @@ function renderAnalysis(result) {
     const groups = result.groups.map((group, index) => ({ ...group, label: labels[index] || group.name }));
     const insufficient = groups.every(group => group.category === 'insufficient');
     if (!insufficient) {
-        const displayValue = group => result.settings.mode === 'default' && Number.isFinite(group.officialRating) ? group.officialRating : group.score;
+        const displayValue = group => group.rating;
         for (const group of [...groups].sort((a, b) => displayValue(b) - displayValue(a))) {
             const category = ['strong', 'weak'].includes(group.category) ? group.category : 'normal';
             $(`grid-${category}`).append(tagCard(group, group.label, result.settings.mode));
@@ -67,7 +67,7 @@ function renderAnalysis(result) {
     else if (weak.length) comment.append(textElement('span', '🔥 '), textElement('b', weak.join(', ')), textElement('span', ' 보완이 필요해요!'));
     else if (strong.length) comment.append(textElement('span', '💪 '), textElement('b', strong.join(', ')), textElement('span', ' 분야에서 강점을 보이고 있어요!'));
     else comment.textContent = '⚖️ 모든 태그가 놀라울 정도로 균형 잡혀 있어요!';
-    comment.title = '강점·약점은 그룹 평균 난이도합 대비 ±10%로 분류합니다. 태그군 중첩의 영향을 받는 자체 지표입니다.';
+    comment.title = '강점·약점은 표시한 태그 레이팅의 그룹 평균 대비 ±10%로 분류합니다. 태그군 중첩의 영향을 받는 자체 지표입니다.';
     $('loading-spinner').style.display = 'none';
     $('analysis-result').style.display = 'block';
     renderInner($('inner-comment'), $('inner-rating-text'), result.inner);

@@ -40,7 +40,7 @@ test('problem card retains its two spans and uses the provided OJ URL', () => {
 });
 
 test('tag cards keep tier badges and Korean tags inside the original hover tooltip', () => {
-    const group = { name: '구현', category: 'weak', keys: ['impl'], score: 648, count: 50, officialRating: 1495 };
+    const group = { name: '구현', category: 'weak', keys: ['impl'], score: 648, count: 50, officialRating: 1495, rating: 1423, ratingCount: 100 };
     const card = tagCard(group, '구현', 'default');
     assert.equal(card.children[0].className, 'tag-name');
     assert.equal(card.children[1].children[0].tagName, 'img');
@@ -48,27 +48,32 @@ test('tag cards keep tier badges and Korean tags inside the original hover toolt
     assert.equal(card.children[2].className, 'tag-tooltip');
     assert.match(card.children[2].textContent, /#구현/);
     const custom = tagCard(group, '구현', 'custom');
-    assert.equal(custom.children[1].children[1].textContent, '648');
+    assert.equal(custom.children[1].children[1].textContent, '1423');
     assert.match(custom.children[2].textContent, /공식 레이팅 아님/);
-    assert.match(custom.children[1].children[0].src, /tiers\/13.svg$/);
-    assert.equal(custom.children[1].children[0].alt, '평균 문제 난이도 Gold III');
-    assert.equal(custom.children[1].children[1].style.color, calculateTierInfo(13).color);
-    assert.match(custom.children[2].textContent, /12.96 → Gold III/);
+    assert.match(custom.children[1].children[0].src, /tiers\/15.svg$/);
+    assert.equal(custom.children[1].children[0].alt, '맞춤 태그 레이팅 Gold I');
+    assert.equal(custom.children[1].children[1].style.color, calculateTierInfo(15).color);
+    assert.match(custom.children[2].textContent, /기존 맞춤 레이팅/);
 });
 
-test('custom badge represents average solved problem difficulty, independently of the score total', () => {
-    for (const [score, count, expectedTier] of [[791, 50, 16], [207, 50, 4], [444, 28, 16], [207, 13, 16], [100, 10, 10], [500, 50, 10], [25, 2, 13], [1, 1, 1], [1500, 50, 30]]) {
-        const card = tagCard({ name: '태그', category: 'normal', keys: ['dp'], score, count }, '', 'custom');
-        assert.match(card.children[1].children[0].src, new RegExp(`/tiers/${expectedTier}\\.svg$`));
-        assert.equal(card.children[1].children[1].textContent, String(score));
-        assert.match(card.children[2].textContent, /공식 레이팅 아님/);
+test('basic and custom ratings share the original tier thresholds, with no average-difficulty conversion', () => {
+    for (const rating of [0, 29, 30, 649, 650, 799, 800, 937, 1423, 1709, 3200]) {
+        const group = { name: '태그', category: 'normal', keys: ['dp'], score: 444, count: 28, rating, ratingCount: 28, officialRating: rating };
+        const basic = tagCard(group, '', 'default'), custom = tagCard(group, '', 'custom');
+        assert.equal(custom.children[1].children[0].src, basic.children[1].children[0].src);
+        assert.equal(custom.children[1].children[1].textContent, String(rating));
+        assert.equal(custom.children[1].children[1].style.color, basic.children[1].children[1].style.color);
+        assert.doesNotMatch(custom.textContent, /평균 문제 난이도/);
     }
+    const capped = tagCard({ keys: [], rating: 2000, ratingCount: 597, ratingCountCapped: true }, '', 'custom');
+    assert.match(capped.textContent, /597개 이상/);
 });
 
-test('empty or malformed custom data has no fabricated tier or non-finite tooltip', () => {
-    for (const [score, count] of [[0, 0], [NaN, 10], [Infinity, 10], [100, 0], [100, -1], [100, 1.5], [100, 51], [100, 1], [-1, 10], [100, undefined]]) {
-        const card = tagCard({ name: '태그', keys: [], score, count }, '', 'custom');
+test('old or malformed custom data cannot silently fall back to a raw sum or average', () => {
+    for (const rating of [undefined, NaN, Infinity, -1, 1.5]) {
+        const card = tagCard({ name: '태그', keys: [], score: 791, count: 50, rating }, '', 'custom');
         assert.match(card.children[1].children[0].src, /tiers\/0.svg$/);
+        assert.equal(card.children[1].children[1].textContent, '—');
         assert.doesNotMatch(card.textContent, /NaN|Infinity/);
     }
 });

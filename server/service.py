@@ -6,7 +6,10 @@ from urllib.parse import quote
 
 from .api import ApiError
 from .cache import SharedCache
-from .analysis import canonical_groups, tag_queries, unique_rated, classify_groups, inner_score
+from .analysis import (
+    canonical_groups, tag_queries, unique_rated, classify_groups, inner_score,
+    legacy_tag_rating, RATING_MODEL, BONUS_SATURATION_COUNT,
+)
 
 
 def settings_values(params):
@@ -91,16 +94,18 @@ class Service:
             raise ApiError(409, "ANALYSIS_REQUIRED", "현재 설정으로 태그 분석을 먼저 실행해 줘. 서버 재시작·15분 경과 후에는 다시 분석해야 해.")
         if all(group['category'] == 'insufficient' for group in cached[1]['groups']):
             raise ApiError(422, 'ANALYSIS_INSUFFICIENT', '레이팅 대상 풀이가 없어 약점 태그를 판단할 수 없어.')
-        groups = sorted((g for g in cached[1]['groups'] if g['category'] == 'weak'), key=lambda g: g['score'])
+        groups = sorted((g for g in cached[1]['groups'] if g['category'] == 'weak'), key=lambda g: g['rating'])
         return list(dict.fromkeys(tag for group in groups for tag in group['keys']))
 
     @staticmethod
     def analysis_key(profile, goal, mode):
-        return (4, profile['id'], profile['handle'], mode, goal if mode == 'custom' else None)
+        return (4, RATING_MODEL, profile['id'], profile['handle'], mode, goal if mode == 'custom' else None)
 
-    def top_sets(self, query, limit, profile_id=None):
+    def top_sets(self, query, limit, profile_id=None, deadline=None):
         problems, total = [], None
         for page in range(1, 17):
+            if deadline is not None and time.monotonic() >= deadline:
+                raise ApiError(503, 'ANALYSIS_TIMEOUT', '분석 대기 시간이 길어졌어. 조회한 페이지는 보관했으니 새로고침해서 이어서 분석해 줘.')
             def load_page():
                 data = checked_page(self.api.get('/problems', q=query, sort='level', direction='desc', page=page))
                 if data.get('page') != page:
@@ -137,10 +142,11 @@ class Service:
                 self.analysis_cache.pop(key, None)
         if not owner:
             try:
-                return response(pending.result(timeout=85))
+                return response(pending.result(timeout=540))
             except FutureTimeout:
                 raise ApiError(503, 'ANALYSIS_BUSY', '같은 설정의 분석이 진행 중이야. 잠시 후 다시 시도해 줘.') from None
         try:
+            deadline = time.monotonic() + 480
             def load_catalog():
                 catalog = self.api.get('/tags').get('tags')
                 if not isinstance(catalog, list):
@@ -152,14 +158,17 @@ class Service:
                         if isinstance(rating.get('rating'), int)}
             for group in groups:
                 problems = []
-                for query in tag_queries(canonical, group['keys']):
-                    problems.extend(self.top_sets(query, 50, profile['id']))
-                best = unique_rated(problems)[:50]
-                group['score'] = sum(problem['level'] for problem in best)
-                group['count'] = len(best)
                 group['officialRating'] = official.get(group['keys'][0]) if len(group['keys']) == 1 else None
-            inner = inner_score(self.top_sets(f'@{canonical} rated:true', 200, profile['id']))
-            result = {'version': 4, 'profileId': profile['id'], 'handle': canonical,
+                use_official = mode == 'default' and group['officialRating'] is not None
+                for query in tag_queries(canonical, group['keys']):
+                    limit = 50 if use_official or len(unique_rated(problems)) >= BONUS_SATURATION_COUNT else BONUS_SATURATION_COUNT
+                    problems.extend(self.top_sets(query, limit, profile['id'], deadline))
+                group.update(legacy_tag_rating(problems))
+                if use_official:
+                    group['rating'] = group['officialRating']
+                    group['ratingCount'] = group['ratingCountCapped'] = None
+            inner = inner_score(self.top_sets(f'@{canonical} rated:true', 200, profile['id'], deadline))
+            result = {'version': 4, 'ratingModel': RATING_MODEL, 'profileId': profile['id'], 'handle': canonical,
                       'settings': {'goal': goal, 'difficulty': difficulty, 'mode': mode},
                       'createdAt': int(time.time() * 1000), 'groups': classify_groups(groups), 'inner': inner}
             with self.lock:

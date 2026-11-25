@@ -1,4 +1,21 @@
+import math
+
 from .api import ApiError
+
+
+RATING_MODEL = 'legacy-tag-v1'
+BONUS_SATURATION_COUNT = 597
+
+
+def legacy_tag_rating(problems):
+    best = unique_rated(problems)
+    top = best[:50]
+    count = min(len(best), BONUS_SATURATION_COUNT)
+    score = sum(problem['level'] for problem in top)
+    bonus = math.floor(200 * (1 - 0.99 ** count) + 0.5)
+    return {'score': score, 'count': len(top), 'ratingCount': count,
+            'ratingCountCapped': count == BONUS_SATURATION_COUNT,
+            'rating': 2 * score + bonus}
 
 
 GROUPS = {
@@ -88,10 +105,10 @@ def unique_rated(problems):
 
 
 def classify_groups(groups):
-    average = sum(group['score'] for group in groups) / len(groups) if groups else 0
+    average = sum(group['rating'] for group in groups) / len(groups) if groups else 0
     for group in groups:
         group['category'] = 'insufficient' if average == 0 else (
-            'weak' if group['score'] < average * 0.9 else 'strong' if group['score'] > average * 1.1 else 'normal')
+            'weak' if group['rating'] < average * 0.9 else 'strong' if group['rating'] > average * 1.1 else 'normal')
     return groups
 
 

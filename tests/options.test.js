@@ -16,7 +16,7 @@ class Element {
 
 const deferred = () => { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; };
 const tick = async () => { for (let i = 0; i < 5; i++) await new Promise(setImmediate); };
-const result = (handle, mode = 'default', goal = 'contest') => ({ profileId: handle === 'other' ? 2 : 1, handle,
+const result = (handle, mode = 'default', goal = 'contest') => ({ ratingModel: 'legacy-tag-v1', profileId: handle === 'other' ? 2 : 1, handle,
     settings: { mode, goal, difficulty: 0 }, groups: [], inner: { status: 'insufficient', score: null, count: 0 } });
 let serial = 0;
 
@@ -91,6 +91,17 @@ test('difficulty changes keep an in-flight analysis and allow its result to rend
     pending.resolve(result('solved_name'));
     await tick();
     assert.equal(e['analysis-result'].style.display, 'block');
+});
+
+test('dashboard sorting follows displayed ratings rather than the raw difficulty sums', async t => {
+    const { elements: e, runTimers } = await setup(t, async () => ({ ...result('solved_name'), groups: [
+        { name: 'raw-high', keys: ['dp'], category: 'normal', score: 800, rating: 900, officialRating: 900 },
+        { name: 'rating-high', keys: ['impl'], category: 'normal', score: 500, rating: 1200, officialRating: 1200 },
+    ] }));
+    await runTimers();
+    const cards = e['grid-normal'].children;
+    assert.equal(cards[0].children[1].children[1].textContent, '1200');
+    assert.equal(cards[1].children[1].children[1].textContent, '900');
 });
 
 test('mode and account changes invalidate late analysis responses', async t => {
