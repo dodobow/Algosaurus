@@ -1,0 +1,9 @@
+{
+  "sourceCommit": "8baa49b",
+  "css": {
+    "common.css": "405d393903969bfa4530f8bf76b589b07505935e46f47d9e66ad764a64dc3821",
+    "popup/popup.css": "7cb525fed999718e32033ae5060b938166d35565326efc6d543765a7e20385ed",
+    "options/options.css": "e8493e35766484b2a6923ca2466bc1d01a58b984009992ffa11b506b632454b8"
+  },
+  "optionsHtml": "54816b2c45b7b6ed2b8f83c1048c88283af19ca5eeb78bf07626539a36ab34ce"
+}

@@ -86,8 +86,6 @@ body.options-body {
     border-bottom: 1px solid #eee;
     background-color: #fff;
     display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
     justify-content: space-between;
     align-items: center;
     min-height: 72px; 
@@ -95,7 +93,6 @@ body.options-body {
 }
 
 .card-header h2 {
-    flex: 1 1 210px;
     font-size: 20px;
     margin: 0;
     color: #333;
@@ -224,16 +221,6 @@ body.options-body {
 .refresh-btn:hover {
     background-color: #f1f3f5;
     color: #333;
-}
-
-#analyze-btn {
-    flex: 0 0 auto;
-    white-space: nowrap;
-}
-
-.tag-card {
-    overflow-wrap: anywhere;
-    min-width: 0;
 }
 
 .spinner-container { 

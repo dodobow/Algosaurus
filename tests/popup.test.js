@@ -9,6 +9,7 @@ class Element {
     setAttribute(name, value) { this.attributes[name] = value; }
     append(...children) { this.children.push(...children); }
     replaceChildren(...children) { this.text = ''; this.children = children; }
+    focus() {}
 }
 
 const profile = (handle = 'solved_name') => ({ id: handle === 'new_user' ? 2 : 1, handle, tier: 10, rating: 700, solvedCount: 250,
@@ -56,10 +57,11 @@ async function setup(raw = {}, fetcher = async url => url.pathname === '/api/pro
 
 test('first run → profile → actual OJ link; settings invalidate the result', async () => {
     const { elements: e, storage } = await setup();
-    assert.match(e.result.textContent, /solved.ac 핸들/);
+    assert.match(e.result.textContent, /아이디를 입력하고/);
     e.solvedId.value = 'solved_name';
     await e.loginBtn.events.click();
-    assert.match(e.result.textContent, /solved.ac: solved_name · BOJ: old_boj/);
+    assert.equal(e.result.children[0].className, 'result-layout');
+    assert.match(e.result.children[0].children[0].children[0].title, /solved.ac: solved_name · BOJ: old_boj/);
     assert.equal(storage.solvedId, 'solved_name');
     await e.recommendBtn.events.click();
     assert.equal(e['problem-view'].children[0].href, 'https://www.acmicpc.net/problem/1000');

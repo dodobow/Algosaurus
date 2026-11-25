@@ -111,6 +111,9 @@ class Service:
         canonical = handle_value(profile['handle'])
         key = self.analysis_key(profile, goal, difficulty, mode)
         with self.lock:
+            cached = self.analysis_cache.get(key)
+            if cached and time.monotonic() - cached[0] < 900:
+                return cached[1]
             if key in self.pending:
                 pending, owner = self.pending[key], False
             else:

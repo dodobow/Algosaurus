@@ -14,5 +14,7 @@ class PackagingTests(unittest.TestCase):
                 names = archive.namelist()
                 self.assertIn('manifest.json', names)
                 self.assertIn('shared/api.js', names)
+                self.assertIn('shared/presentation.js', names)
+                self.assertTrue(all(f'assets/tiers/{tier}.svg' in names for tier in range(32)))
                 self.assertFalse(any(name.startswith(('server/', 'tests/', '.env', '.local/')) for name in names))
                 self.assertFalse(any(b'x-client-secret' in archive.read(name) for name in names))

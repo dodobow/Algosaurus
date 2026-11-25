@@ -25,6 +25,12 @@ def handler_for(service, extension_ids=()):
             return origin
 
         def reply(self, status, data, retry_after=None):
+            try:
+                self._reply(status, data, retry_after)
+            except ConnectionError:
+                pass
+
+        def _reply(self, status, data, retry_after=None):
             body = json.dumps(data, ensure_ascii=False, allow_nan=False).encode("utf-8")
             self.send_response(status)
             if getattr(self, "allowed_origin", None):

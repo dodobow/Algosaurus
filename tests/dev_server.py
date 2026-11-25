@@ -23,7 +23,9 @@ def handler_with_assets(service):
             allowed = {'popup/popup.html', 'popup/popup.js', 'popup/popup.css', 'options/options.html',
                        'options/options.js', 'options/options.css', 'utils.js', 'common.css',
                        'shared/api.js', 'shared/storage.js', 'shared/ui.js', 'tests/browser-shim.js',
+                       'shared/presentation.js',
                        'assets/algoIcon128.png'}
+            allowed.update(f'assets/tiers/{tier}.svg' for tier in range(32))
             if path not in allowed:
                 self.send_error(404)
                 return

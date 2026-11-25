@@ -1,6 +1,7 @@
 import json
 import threading
 import unittest
+from unittest.mock import Mock
 from http.client import HTTPConnection
 from http.server import ThreadingHTTPServer
 
@@ -11,6 +12,13 @@ from tests.fixtures import FixtureApi
 
 
 class HttpTests(unittest.TestCase):
+    def test_client_cancellation_does_not_retry_a_closed_connection(self):
+        handler = object.__new__(handler_for(Service(FixtureApi())))
+        for error in [ConnectionAbortedError, ConnectionResetError, BrokenPipeError]:
+            handler._reply = Mock(side_effect=error('client cancelled'))
+            handler.reply(200, {'ok': True})
+            handler._reply.assert_called_once_with(200, {'ok': True}, None)
+
     @classmethod
     def setUpClass(cls):
         cls.server = ThreadingHTTPServer(('127.0.0.1', 0), handler_for(Service(FixtureApi())))
