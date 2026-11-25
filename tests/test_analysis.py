@@ -77,6 +77,7 @@ class AnalysisTests(unittest.TestCase):
     def test_no_solved_data_is_not_a_normal_score(self):
         api = FixtureApi()
         api.solved = []
+        api.user['tagRatings'] = []
         service = Service(api)
         result = service.analyze({'handle': 'solved_name'})
         self.assertTrue(all(g['category'] == 'insufficient' for g in result['groups']))

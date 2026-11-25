@@ -56,17 +56,17 @@ export function problemLink(problem) {
 
 export function tagCard(group, label, mode) {
     const official = mode === 'default' && Number.isFinite(group.officialRating);
-    const value = official ? group.officialRating : Number.isFinite(group.score) ? group.score : '—';
-    const average = Number.isInteger(group.count) && group.count > 0 && group.count <= 50 &&
-        Number.isInteger(group.score) && group.score >= group.count && group.score <= 30 * group.count ? group.score / group.count : null;
-    const tier = calculateTierInfo(official ? calculateRatingToTier(value) : average === null ? 0 : Math.round(average));
+    const rating = official ? group.officialRating : group.rating;
+    const valid = Number.isInteger(rating) && rating >= 0;
+    const value = valid ? rating : '—';
+    const tier = calculateTierInfo(valid ? calculateRatingToTier(rating) : 0);
     const card = textElement('div', '', `tag-card ${group.category}`);
     card.append(textElement('span', label || group.name, 'tag-name'));
     const row = textElement('div', '');
     Object.assign(row.style, { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '5px' });
     const badge = document.createElement('img');
     badge.src = tier.badgeUrl;
-    badge.alt = official ? tier.name : average === null ? '분석할 풀이 없음' : `평균 문제 난이도 ${tier.name}`;
+    badge.alt = official ? tier.name : valid ? `맞춤 태그 레이팅 ${tier.name}` : '레이팅 데이터 없음';
     Object.assign(badge.style, { height: '20px', transform: 'translateY(1px)' });
     const score = colored(value, tier.color, 'tag-tier');
     Object.assign(score.style, { display: 'inline-block', lineHeight: '1' });
@@ -74,8 +74,9 @@ export function tagCard(group, label, mode) {
     const tooltip = textElement('div', '', 'tag-tooltip');
     const tags = textElement('span', '', 'tooltip-tags');
     for (const key of group.keys) tags.append(textElement('span', '#' + (TAG_LABELS[key] || key), 'tag-badge'));
-    const description = official ? '공식 태그 레이팅' : average === null ? '평균 문제 난이도 배지를 계산할 풀이가 없습니다. 공식 레이팅 아님' :
-        `배지: 평균 문제 난이도 ${average.toFixed(2)} → ${tier.name} (반올림) · 점수: 상위 ${group.count}개 고유 문제 세트 난이도합 · 공식 레이팅 아님`;
+    const solved = group.ratingCountCapped ? '597개 이상 (개수 보너스 200)' : `${group.ratingCount}개`;
+    const description = official ? '공식 태그 레이팅' : !valid ? '레이팅 데이터가 없습니다. 로컬 API 서버를 재시작하고 다시 분석해주세요.' :
+        `기존 맞춤 레이팅: 2 × 상위 50세트 난이도합 + round(200 × (1 − 0.99^해결 세트 수)) · 해결 ${solved} · 공식 레이팅 아님`;
     tooltip.append(tags, textElement('span', description));
     card.append(row, tooltip);
     return card;
