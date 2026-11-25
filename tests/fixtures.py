@@ -1,6 +1,9 @@
 from copy import deepcopy
 
 from server.api import ApiError
+import re
+import json
+from pathlib import Path
 
 
 PROFILE = {
@@ -24,6 +27,8 @@ class FixtureApi:
         self.problems = [problem()]
         self.diagnostics = []
         self.user = deepcopy(PROFILE)
+        self.user['tagRatings'] = [{'key': 'dp', 'rating': 900}]
+        self.solved = [problem(10000 + i, '', 10 - i // 50, ['dp' if i % 2 else 'impl']) for i in range(230)]
 
     def get(self, path, **params):
         self.calls.append((path, params))
@@ -39,8 +44,17 @@ class FixtureApi:
             data['handle'] = handle
             return data
         if path == '/problems':
-            return {"problems": deepcopy(self.problems), "total": len(self.problems), "page": params.get('page', 1), "pageSize": 50,
+            if params.get('q', '').startswith('@'):
+                tags = re.findall(r'#([\w-]+)', params['q'])
+                solved = [p for p in self.solved if not tags or any(tag['key'] in tags for tag in p['tags'])]
+                page = params.get('page', 1)
+                items, total = solved[(page - 1) * 50:page * 50], len(solved)
+            else:
+                items, total = self.problems, len(self.problems)
+            return {"problems": deepcopy(items), "total": total, "page": params.get('page', 1), "pageSize": 50,
                     "diagnostics": self.diagnostics}
         if path.startswith('/problems/'):
             return deepcopy(self.problems[0])
+        if path == '/tags':
+            return json.loads((Path(__file__).parent / 'data' / 'tags-v4.json').read_text(encoding='utf-8'))
         raise AssertionError((path, params))

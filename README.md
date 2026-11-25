@@ -1,84 +1,108 @@
-# 🌳🦖 알고사우루스 (Algosaurus) 🦕🌴
+# 🌳🦖 알고사우루스 (Algosaurus)
 
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![Chrome](https://img.shields.io/badge/Chrome_Extension-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white)
+solved.ac 공식 API v4를 사용하는 Vanilla JavaScript Chrome 확장이야. 프로필 조회, 목표·난이도 설정, 안 푼 BOJ 문제 추천, 태그·내실 분석과 약점 추천을 제공해.
 
-> Solved.ac 데이터를 활용하여 나에게 딱 맞는 알고리즘 문제를 추천해주는 PS계의 포식자. **알고사우루스!**
+구성은 **Chrome 확장 → localhost Python 서버 → solved.ac API v4**야. 앱 시크릿은 서버에만 두고, 사용자 OAuth는 사용하지 않아. 공개 프로필과 특정 계정의 풀이를 명시한 검색으로 필요한 기능을 구현했어.
 
-무슨 문제를 풀어야 할까? 어떤 자료구조와 알고리즘을 공부해야 하지?  
-알고사우루스는 사용자의 **Solved.ac 티어와 목표를 분석**하여 **적당한 난이도와 태그**를 보여주고 풀기 **좋은 문제를 추천**해줍니다.
+## 준비
 
-<br/>
+- Python 3.11 이상, Chrome 120 이상
+- [solved.ac Backstage](https://backstage.solved.ac/developer/apps)에 등록한 앱의 Client ID와 Client Secret
+- 본인의 **solved.ac 핸들**. BOJ 핸들과 다를 수 있어.
+- 검증 명령을 실행하려면 Node.js 20 이상. npm 설치와 외부 패키지는 필요 없어.
 
-## ✨ 주요 기능 (Key Features)
-
-- **🧩 맞춤형 문제 추천** - 이제 문제 난이도 고민은 그만!
-  - 사용자의 Solved.ac 티어와 목표를 기반으로 적절한 난이도의 문제를 추천합니다.
-  - 공부 목적(입문, 취업, 대회)에 따라 추천 범위를 자동으로 보정합니다.
-  - 사용자의 약점을 보완하기 위한 문제도 추천받을 수 있습니다.
-
-- **📚 목표별 10대 태그 그룹** - 목표에 따른 자세한 태그 분석!
-  - 목표를 위한 주요 태그들을 10개의 그룹으로 묶어 강점 / 균형 / 약점으로 나누어 분석합니다.
-  - 기존 Solved.ac 8대 태그의 부족한 점을 보완했습니다.
-  - 어떤 자료구조, 알고리즘을 공부할지 방향성을 제시합니다. 
-
-- **📊 섬세한 난이도 조절** - 스스로 조절해가며 찾아가는 적정 수준
-  - "조금 더 쉽게", "조금 더 어렵게"와 같은 옵션을 통해, 추천 범위를 미세 조정할 수 있습니다.
-  - 옵션 변경 시 추천되는 티어 범위를 실시간으로 확인 할 수 있습니다.
-
-<br/>
-
-## 📸 스크린샷 (Screenshots)
-
-| **팝업 메인 (Popup)** | **설정 페이지 (Options)** |
-|:---:|:---:|
-| <img src="./assets/preview_popup.png" width="300"> | <img src="./assets/preview_option.png" width="600"> |
-| 내 티어 확인 및 문제 뽑기 | 목표 설정 및 난이도 조절 |
-
-<br/>
-
-## 🚀 설치 및 실행 방법 (Installation)
-
-이 프로젝트는 현재 크롬 웹 스토어에 등록되지 않았으며, **개발자 모드**를 통해 설치할 수 있습니다.
-
-1. 이 저장소를 다운로드하거나 클론(Clone)합니다.
-2. 크롬 브라우저 주소창에 `chrome://extensions/`를 입력하여 이동합니다.
-3. 우측 상단의 **'개발자 모드(Developer mode)'** 스위치를 켭니다.
-4. 좌측 상단의 **'압축 해제된 확장 프로그램을 로드합니다(Load unpacked)'** 버튼을 클릭합니다.
-5. 다운로드 받은 프로젝트 폴더(`Algosaurus`)를 선택합니다.
-
-<br/>
-
-## 🛠️ 기술 스택 (Tech Stack)
-
-- **Frontend:** HTML, CSS, JavaScript (Vanilla)
-- **API:** [solved.ac 공식 API v4](https://backstage.solved.ac/ko/developer/docs)
-- **Platform:** Chrome Extension Manifest V3
-
-## API 서버 (v4 전환 기반)
-
-Python 3.11 이상이 필요합니다. 별도 Python 패키지는 없습니다.
-Backstage에서 앱을 등록하고 PowerShell 환경변수로 인증정보를 지정합니다.
-`.env.example`을 `.env`로 복사해 값을 넣어도 됩니다. 기존 환경변수가 우선합니다.
+## 실행과 확장 설치
 
 ```powershell
-$env:SOLVED_CLIENT_ID = '<앱 ID>'
-$env:SOLVED_CLIENT_SECRET = '<앱 시크릿>'
+cd C:\Projects\Algosaurus
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+```
+
+`.env`를 열어 `SOLVED_CLIENT_ID`와 `SOLVED_CLIENT_SECRET`을 입력한 뒤 실행해. 비밀값을 Git이나 확장 코드에 넣지 마. 기존 환경변수가 있으면 `.env`보다 우선해.
+
+```powershell
 python -m server.app
 ```
 
-서버는 `http://127.0.0.1:8765`에만 열립니다. 시크릿을 확장 코드나 Git에 넣지 마세요.
-공개 프로필과 문제 검색에는 사용자 OAuth가 필요하지 않습니다.
-설계 근거와 호출 제한은 [v4 전환 문서](docs/api-v4.md)를 참고하세요.
+기본 주소는 `http://127.0.0.1:8765`야. 서버는 이 컴퓨터의 loopback에만 열리고 외부 패키지는 설치하지 않아.
+
+1. Chrome에서 `chrome://extensions/`를 열고 개발자 모드를 켜.
+2. **압축 해제된 확장 프로그램을 로드**에서 `C:\Projects\Algosaurus`를 선택해. 기존 사용자는 같은 위치의 확장을 새로고침해.
+3. 팝업에 solved.ac 핸들을 입력하고 **조회**를 눌러. solved.ac와 연결된 BOJ 핸들이 따로 표시돼.
+4. **My Page**에서 입문·취업·대회 목표와 난이도(-2~2)를 골라. 미설정 기본값은 대회·보통이야.
+5. **분석하기**를 누르면 태그와 내실을 함께 계산해. 분석은 호출 비용이 있어서 설정 변경마다 자동 실행하지 않아.
+6. 팝업에서 **목표 맞춤** 또는 **약점 보충**으로 추천받고 BOJ 링크를 열어.
+
+추천은 설정 난이도, 한국어 문제문, BOJ 제출 가능 조건을 적용하고 조회한 solved.ac 사용자의 풀이를 제외해. 실제 링크는 문제 상세의 `ojLinks`에서 받아. solved.ac 문제 번호로 BOJ URL을 만들지 않아.
+
+2026-11-25에 `dodobow`의 실제 프로필·목표 추천·약점 추천·기본/취업 맞춤 분석을 확인했고, 팝업에서 추천한 BOJ 18223번의 문제 본문까지 열었어. Chrome 저장소 대역을 사용한 화면 검증이며, 실제 확장 설치·코드 제출 검증과는 구분해.
+
+## 설정값
+
+| 값 | 용도 |
+| --- | --- |
+| `SOLVED_CLIENT_ID` | Backstage 앱 ID. 필수 |
+| `SOLVED_CLIENT_SECRET` | 서버 전용 앱 시크릿. 필수 |
+| `PORT` | 기본 8765. 변경하면 `shared/api.js`의 `API_BASE`도 맞춰 줘 |
+| `ALLOWED_EXTENSION_IDS` | 선택. `chrome://extensions/`의 ID를 쉼표로 지정하면 해당 확장만 허용해 |
+
+이 구성은 개인 로컬 실행용이야. 공용 서버 배포는 포함하지 않아. 배포할 때는 별도 서버 인증·HTTPS·정확한 확장 Origin과 host 권한 구성이 필요해.
+
+## 기존 사용자
+
+기존 `goal_<핸들>`, `diff_<핸들>`, `mode_<핸들>`을 보존해. 최초 v4 전환에서는 저장된 ID가 BOJ 핸들일 수 있으므로 solved.ac 핸들을 확인하고 직접 조회해야 해.
+
+새 프로필의 인증된 BOJ 연결이 옛 ID와 일치하면 목표·난이도·모드를 새 solved.ac 핸들로 복사해. 이미 있는 새 설정과 옛 키는 덮어쓰거나 지우지 않아. 연결이 확인되지 않으면 기존 설정은 남겨 두고 새 계정의 기본값을 사용해. 이전 약점·티어·레이팅 합 캐시는 재사용하지 않아.
+
+약점 추천용 분석은 서버에서 계정·목표·난이도·모드별로 15분간 유지해. 설정 변경·기한 만료·서버 재시작 뒤에는 다시 분석해. API 실패와 429 대기 시간, 분석 데이터 부족, 추천 결과 없음은 화면에 구분해서 표시해.
+
+## 분석 지표
+
+- 프로필 및 단일 태그의 **공식 레이팅**은 API 응답 값을 사용해.
+- 태그군은 상위 50개 레이팅 대상 고유 문제 세트의 **난이도합**을 비교해. 기본 8개·목표 맞춤 10개 그룹을 제공해. 평균 대비 ±10%로 강점·균형·약점을 나누며, 모두 0이면 판단 불가야.
+- 내실은 상위 200개 레이팅 대상 고유 문제 세트의 난이도 균형 지표야. 같은 세트의 소문제는 가장 높은 난이도 하나로 계산해. 데이터가 부족하거나 조회가 실패하면 점수를 만들지 않아.
+- 맞춤 지표는 공식 레이팅이나 객관적인 실력 점수가 아니야. 태그군 중첩과 범위의 영향을 받아.
+
+변경된 레이팅·태그 키·검색·중복 처리의 근거와 정확한 계산식은 [v4 전환 설계](docs/api-v4.md)에 적어 뒀어.
+
+## 검증
 
 ```powershell
 python -m unittest discover -s tests -p 'test_*.py' -v
 npm test
+python tools/check.py
 ```
 
-<br/>
+테스트는 모의 upstream과 Chrome 저장소·DOM 대역을 사용해. 실제 인증 API 검증과 구분한 결과는 [검증 기록](docs/verification.md)을 참고해.
 
-## 📝 License
+시크릿 없이 실제 HTML/JS를 브라우저에서 확인하려면 API 서버를 끈 상태에서 다음을 실행해. 테스트 데이터만 반환하고 Chrome storage 대신 테스트용 localStorage를 사용해.
 
-This project is licensed under the MIT License.
+```powershell
+python -m tests.dev_server
+# http://127.0.0.1:8765/popup/popup.html
+```
+
+실제 API로 화면을 확인하려면 `.env`를 준비한 뒤 `python -m tests.dev_server --live`로 실행해. 이 모드도 Chrome 저장소는 테스트용 localStorage로 대체하므로 실제 확장 설치 검증은 아니야. 모의 서버와 실제 서버는 모두 같은 8765 포트를 사용하니 하나씩 실행해.
+
+인증정보가 설정된 실제 서버를 실행한 뒤에는 다음으로 프로필·추천을 확인할 수 있어.
+
+```powershell
+python tools/smoke.py <solved.ac_핸들> --goal job --difficulty 1
+python tools/smoke.py <solved.ac_핸들> --analysis
+```
+
+## 확장 배포 파일
+
+```powershell
+python tools/package_extension.py
+```
+
+`.local/Algosaurus-extension.zip`에 manifest·팝업·설정·공통 모듈·아이콘만 담아. 서버, `.env`, 테스트, 로컬 백업은 포함하지 않아. 이 ZIP을 풀어 확장으로 설치할 수 있어. 기존 설치 경로를 바꾸면 Chrome의 확장 ID와 저장소가 달라질 수 있으므로 기존 사용자는 같은 경로에서 갱신해.
+
+## 공식 문서
+
+- [API v4 문서](https://backstage.solved.ac/ko/developer/docs#description/introduction)
+- [v4 변경 공지](https://solved.ac/notices/v4)
+- [공식 API 제공 안내](https://solved.ac/notices/261117-api)
+
+MIT License.
